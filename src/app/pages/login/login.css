@@ -1,0 +1,143 @@
+.login-page {
+  min-height: 100dvh;
+  box-sizing: border-box;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  padding: clamp(48px, 13vh, 118px) 24px 40px;
+  background: #fff;
+  color: #211738;
+  font-family: Poppins, system-ui, sans-serif;
+}
+
+.login-panel {
+  width: min(100%, 412px);
+}
+
+.logo {
+  display: block;
+  width: min(245px, 80%);
+  height: auto;
+  margin: 0 auto 24px;
+}
+
+a.acao {
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  text-decoration: none;
+}
+h1 {
+  margin: 0 0 28px;
+  text-align: center;
+  font-size: 28px;
+}
+
+.descricao {
+  margin: 0 0 12px;
+  color: #655979;
+  font-size: 12px;
+}
+
+.campo {
+  margin-bottom: 14px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: #655979;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+input,
+button {
+  font: inherit;
+  font-size: 12px;
+}
+
+input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid #e7e0f0;
+  border-radius: 8px;
+  color: #211738;
+  background: #fff;
+}
+
+.senha {
+  position: relative;
+}
+
+.senha input {
+  padding-right: 84px;
+}
+
+.mostrar-senha {
+  position: absolute;
+  inset: 0 8px 0 auto;
+  border: 0;
+  background: transparent;
+  color: #6041b0;
+  cursor: pointer;
+}
+
+.recuperar {
+  font-size: 12px;
+  display: block;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #6041b0;
+  font-weight: 400;
+}
+
+.acao {
+  display: block;
+  width: 100%;
+  min-height: 42px;
+  margin-top: 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.entrar {
+  background: #6041b0;
+  color: #fff;
+  cursor: pointer;
+}
+
+.entrar:hover {
+  background: #513498;
+}
+
+
+
+.cadastro {
+  border-color: #e7e0f0;
+  background: #fff;
+  color: #211738;
+}
+
+
+
+:focus-visible {
+  outline: 2px solid #6041b0;
+  outline-offset: 2px;
+}
+
+.erro,
+.mensagem {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+.erro {
+  color: #a12747;
+}

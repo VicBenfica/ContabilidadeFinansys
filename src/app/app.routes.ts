@@ -1,9 +1,12 @@
 import { Routes } from '@angular/router';
-import { Password } from './pages/password/password';
+import { Login } from './pages/login/login';
+import { Cadastro } from './pages/cadastro/cadastro';
 
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
-    { path: 'password', component: Password },
+
+    { path: 'login', component: Login },
+    { path: 'cadastro', component: Cadastro },
 
 ];

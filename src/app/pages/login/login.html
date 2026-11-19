@@ -1,0 +1,48 @@
+<main class="login-page">
+    <section class="login-panel" aria-labelledby="login-title">
+        <img class="logo" src="logoFinanSysHorizontal.png" alt="FinanSys — Sistema Contábil">
+
+        <h1 id="login-title">Login</h1>
+        <p class="descricao">Acesse as empresas vinculadas à sua conta.</p>
+
+        <form #loginForm="ngForm" (ngSubmit)="entrar(loginForm)">
+            <div class="campo">
+                <label for="email">E-mail</label>
+                <input id="email" name="email" type="email" placeholder="nome@exemplo.com" autocomplete="username"
+                    [(ngModel)]="email" #emailInput="ngModel"
+                    [attr.aria-invalid]="emailInput.touched && emailInput.invalid"
+                    [attr.aria-describedby]="emailInput.touched && emailInput.invalid ? 'email-erro' : null" required
+                    email>
+                @if (emailInput.touched && emailInput.invalid) {
+                <small class="erro" id="email-erro">Informe um e-mail válido.</small>
+                }
+            </div>
+
+            <div class="campo">
+                <label for="senha">Senha</label>
+                <div class="senha">
+                    <input id="senha" name="senha" [type]="mostrarSenha ? 'text' : 'password'"
+                        autocomplete="current-password" [(ngModel)]="senha" #senhaInput="ngModel"
+                        [attr.aria-invalid]="senhaInput.touched && senhaInput.invalid"
+                        [attr.aria-describedby]="senhaInput.touched && senhaInput.invalid ? 'senha-erro' : null"
+                        required>
+                    <button type="button" class="mostrar-senha" (click)="mostrarSenha = !mostrarSenha">
+                        {{ mostrarSenha ? 'Ocultar' : 'Mostrar' }}
+                    </button>
+                </div>
+                @if (senhaInput.touched && senhaInput.invalid) {
+                <small class="erro" id="senha-erro">Informe sua senha.</small>
+                }
+            </div>
+            <a class="recuperar" routerLink="/recuperar-senha">Esqueceu sua senha?</a>
+
+            <button type="submit" class="acao entrar">Entrar</button>
+            <a class="acao cadastro" routerLink="/cadastro">Criar uma conta</a>
+
+
+            @if (mensagem) {
+            <p class="mensagem" role="status">{{ mensagem }}</p>
+            }
+        </form>
+    </section>
+</main>
