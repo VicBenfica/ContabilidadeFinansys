@@ -6,44 +6,96 @@
   --fs-suave: #655979;
   --fs-borda: #e7e0f0;
   display: grid;
-  grid-template-columns: 224px minmax(0, 1fr);
+grid-template-columns: 202px minmax(0, 1fr);
   min-height: 100dvh;
   background: var(--fs-fundo);
   color: var(--fs-texto);
   font-family: Poppins, system-ui, sans-serif;
 }
-
 .fs-sidebar {
   box-sizing: border-box;
   min-height: 100%;
-  padding: 24px 16px;
-  background: var(--fs-menu);
-  color: #fff;
+  padding: 26px 14px 20px;
+  background: var(--fs-menu, #25163f);
+  color: #e8ddf3;
 }
 
 .fs-brand {
   display: block;
-  width: fit-content;
-  padding: 8px;
-  border-radius: 8px;
-  background: #fff;
+  width: 138px;
+  max-width: 100%;
+  margin: 0 0 27px 2px;
 }
 
-.fs-brand img { display: block; width: 140px; max-width: 100%; }
-.fs-nav-label { margin-top: 32px; color: #d8c9ed; font-size: 10px; letter-spacing: 1.4px; }
-.fs-nav { display: grid; gap: 6px; }
-.fs-nav a, .fs-nav-pendente {
+.fs-brand img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.fs-nav {
+  display: grid;
+  gap: 7px;
+}
+
+.fs-nav-label {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #d8c9ed;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.fs-nav-item {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 11px 12px;
+  gap: 12px;
+  min-height: 38px;
+  padding: 0 10px;
   border-radius: 8px;
-  color: #efdef9;
+  color: #e8ddf3;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
   text-decoration: none;
-  font-size: 13px;
 }
 
-.fs-nav-pendente { opacity: .65; }
+.fs-nav-icon {
+  flex: 0 0 16px;
+  color: #c9b7d9;
+  font-size: 14px;
+  line-height: 1;
+  text-align: center;
+}
+
+.fs-nav-pendente {
+  cursor: default;
+}
+
+a.fs-nav-item:hover {
+  background: #362451;
+}
+
+.fs-nav .fs-nav-item.fs-active {
+  background: #4d3276;
+  color: #fff;
+}
+
+.fs-nav-item.fs-active .fs-nav-icon {
+  color: #ff75af;
+}
+
+.fs-nav-item:focus-visible,
+.fs-brand:focus-visible {
+  outline: 2px solid #ff75af;
+  outline-offset: 2px;
+
+}
+
 .fs-nav .fs-active, .fs-nav a:hover { background: #4d3276; color: #fff; }
 
 .fs-topbar, .fs-topbar-acoes {
