@@ -1,1 +1,118 @@
-/* You can add global styles to this file, and also import other style files */
+.fs-layout {
+  --fs-fundo: #f6f4ff;
+  --fs-menu: #25163f;
+  --fs-roxo: #6041b0;
+  --fs-texto: #211738;
+  --fs-suave: #655979;
+  --fs-borda: #e7e0f0;
+  display: grid;
+  grid-template-columns: 224px minmax(0, 1fr);
+  min-height: 100dvh;
+  background: var(--fs-fundo);
+  color: var(--fs-texto);
+  font-family: Poppins, system-ui, sans-serif;
+}
+
+.fs-sidebar {
+  box-sizing: border-box;
+  min-height: 100%;
+  padding: 24px 16px;
+  background: var(--fs-menu);
+  color: #fff;
+}
+
+.fs-brand {
+  display: block;
+  width: fit-content;
+  padding: 8px;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.fs-brand img { display: block; width: 140px; max-width: 100%; }
+.fs-nav-label { margin-top: 32px; color: #d8c9ed; font-size: 10px; letter-spacing: 1.4px; }
+.fs-nav { display: grid; gap: 6px; }
+.fs-nav a, .fs-nav-pendente {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  border-radius: 8px;
+  color: #efdef9;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.fs-nav-pendente { opacity: .65; }
+.fs-nav .fs-active, .fs-nav a:hover { background: #4d3276; color: #fff; }
+
+.fs-topbar, .fs-topbar-acoes {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.fs-topbar {
+  justify-content: space-between;
+  padding: 16px clamp(20px, 3vw, 36px);
+  background: #fff;
+  border-bottom: 1px solid var(--fs-borda);
+  color: var(--fs-suave);
+  font-size: 13px;
+}
+
+.fs-botao {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border: 1px solid var(--fs-borda);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--fs-texto);
+  text-decoration: none;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.fs-primario { background: var(--fs-roxo); color: #fff; }
+.fs-layout button:disabled { opacity: .65; cursor: not-allowed; }
+.fs-conteudo { padding: 28px clamp(20px, 3vw, 36px); }
+.fs-page-header { margin-bottom: 22px; }
+.fs-page-header small { color: var(--fs-roxo); font-size: 10px; font-weight: 700; letter-spacing: 1.4px; }
+.fs-page-header h1 { margin: 4px 0; font-size: 30px; }
+.fs-page-header p, .fs-card p { margin: 6px 0 16px; color: var(--fs-suave); font-size: 13px; }
+
+.fs-card {
+  margin-bottom: 16px;
+  padding: 20px;
+  border: 1px solid var(--fs-borda);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.fs-card h2 { margin: 0; font-size: 17px; }
+.fs-campos { display: grid; grid-template-columns: 1.3fr 1fr .9fr; gap: 12px; margin-bottom: 16px; }
+.fs-campos label { display: grid; gap: 5px; font-size: 12px; font-weight: 600; }
+.fs-campos input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid var(--fs-borda);
+  border-radius: 7px;
+  font: inherit;
+  font-weight: 400;
+}
+
+.fs-table-wrap { overflow-x: auto; }
+.fs-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+.fs-table th, .fs-table td { padding: 10px 12px; }
+.fs-table th { background: #f0eafb; }
+.fs-table tbody tr:nth-child(even) { background: #faf8fe; }
+
+@media (max-width: 720px) {
+  .fs-layout, .fs-campos { grid-template-columns: 1fr; }
+  .fs-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
