@@ -87,12 +87,13 @@ input {
 }
 
 .recuperar {
+  font-size: 12px;
   display: block;
   padding: 0;
   border: 0;
   background: transparent;
   color: #6041b0;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .acao {
