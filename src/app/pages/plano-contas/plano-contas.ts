@@ -1,86 +1,25 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { Card } from '../../shared/components/card/card';
-
-export type GrupoContabil =
-  | 'Ativo'
-  | 'Passivo'
-  | 'Patrimônio Líquido'
-  | 'Despesa'
-  | 'Receita'
-  | 'Apuração do Resultado';
-
-export type SubgrupoContabil =
-  | 'Circulante'
-  | 'Realizável a Longo Prazo'
-  | 'Investimento'
-  | 'Imobilizado'
-  | 'Intangível'
-  | 'Não Circulante'
-  | 'N/A';
-
-export type TipoConta = 'Sintética' | 'Analítica';
-
-export interface ContaContabil {
-  codigo: string;
-  nome: string;
-  grupo: GrupoContabil;
-  subgrupo: SubgrupoContabil;
-  tipo: TipoConta;
-  nivel: number;
-}
-
-const PLANO_PADRAO: ContaContabil[] = [
-  { codigo: '1.0.1', nome: 'Caixa', grupo: 'Ativo', subgrupo: 'Circulante', tipo: 'Analítica', nivel: 2 },
-  { codigo: '1.0.2', nome: 'Bancos Conta Movimento', grupo: 'Ativo', subgrupo: 'Circulante', tipo: 'Analítica', nivel: 2 },
-  { codigo: '1.0.3', nome: 'Clientes', grupo: 'Ativo', subgrupo: 'Circulante', tipo: 'Analítica', nivel: 2 },
-  { codigo: '1.0.4', nome: 'Estoques', grupo: 'Ativo', subgrupo: 'Circulante', tipo: 'Analítica', nivel: 2 },
-  { codigo: '1.0.5', nome: 'Despesas Antecipadas', grupo: 'Ativo', subgrupo: 'Circulante', tipo: 'Analítica', nivel: 2 },
-  { codigo: '2.0.1', nome: 'Clientes - Longo Prazo', grupo: 'Ativo', subgrupo: 'Realizável a Longo Prazo', tipo: 'Analítica', nivel: 2 },
-  { codigo: '2.0.2', nome: 'Depósitos Judiciais', grupo: 'Ativo', subgrupo: 'Realizável a Longo Prazo', tipo: 'Analítica', nivel: 2 },
-  { codigo: '2.1.1', nome: 'Participações Societárias', grupo: 'Ativo', subgrupo: 'Investimento', tipo: 'Analítica', nivel: 2 },
-  { codigo: '2.1.2', nome: 'Imóveis para Renda', grupo: 'Ativo', subgrupo: 'Investimento', tipo: 'Analítica', nivel: 2 },
-  { codigo: '2.2.1', nome: 'Máquinas e Equipamentos', grupo: 'Ativo', subgrupo: 'Imobilizado', tipo: 'Analítica', nivel: 2 },
-  { codigo: '2.2.2', nome: 'Veículos', grupo: 'Ativo', subgrupo: 'Imobilizado', tipo: 'Analítica', nivel: 2 },
-  { codigo: '2.2.3', nome: 'Móveis e Utensílios', grupo: 'Ativo', subgrupo: 'Imobilizado', tipo: 'Analítica', nivel: 2 },
-  { codigo: '2.2.4', nome: 'Depreciação Acumulada', grupo: 'Ativo', subgrupo: 'Imobilizado', tipo: 'Analítica', nivel: 2 },
-  { codigo: '2.3.1', nome: 'Softwares', grupo: 'Ativo', subgrupo: 'Intangível', tipo: 'Analítica', nivel: 2 },
-  { codigo: '2.3.2', nome: 'Marcas e Patentes', grupo: 'Ativo', subgrupo: 'Intangível', tipo: 'Analítica', nivel: 2 },
-  { codigo: '3.0.1', nome: 'Fornecedores', grupo: 'Passivo', subgrupo: 'Circulante', tipo: 'Analítica', nivel: 2 },
-  { codigo: '3.0.2', nome: 'Salários a Pagar', grupo: 'Passivo', subgrupo: 'Circulante', tipo: 'Analítica', nivel: 2 },
-  { codigo: '3.0.3', nome: 'Impostos a Recolher', grupo: 'Passivo', subgrupo: 'Circulante', tipo: 'Analítica', nivel: 2 },
-  { codigo: '3.0.4', nome: 'Empréstimos Bancários CP', grupo: 'Passivo', subgrupo: 'Circulante', tipo: 'Analítica', nivel: 2 },
-  { codigo: '3.0.5', nome: 'Contas a Pagar', grupo: 'Passivo', subgrupo: 'Circulante', tipo: 'Analítica', nivel: 2 },
-  { codigo: '3.1.1', nome: 'Empréstimos Bancários LP', grupo: 'Passivo', subgrupo: 'Não Circulante', tipo: 'Analítica', nivel: 2 },
-  { codigo: '3.1.2', nome: 'Provisões Trabalhistas', grupo: 'Passivo', subgrupo: 'Não Circulante', tipo: 'Analítica', nivel: 2 },
-  { codigo: '3.1.3', nome: 'Contas a Pagar LP', grupo: 'Passivo', subgrupo: 'Não Circulante', tipo: 'Analítica', nivel: 2 },
-  { codigo: '4.0.1', nome: 'Capital Social', grupo: 'Patrimônio Líquido', subgrupo: 'N/A', tipo: 'Analítica', nivel: 2 },
-  { codigo: '4.0.2', nome: 'Reservas de Lucros', grupo: 'Patrimônio Líquido', subgrupo: 'N/A', tipo: 'Analítica', nivel: 2 },
-  { codigo: '4.0.3', nome: 'Lucros Acumulados', grupo: 'Patrimônio Líquido', subgrupo: 'N/A', tipo: 'Analítica', nivel: 2 },
-  { codigo: '5.0.1', nome: 'CMV', grupo: 'Despesa', subgrupo: 'N/A', tipo: 'Analítica', nivel: 2 },
-  { codigo: '5.0.2', nome: 'CPV', grupo: 'Despesa', subgrupo: 'N/A', tipo: 'Analítica', nivel: 2 },
-  { codigo: '5.0.3', nome: 'CSP', grupo: 'Despesa', subgrupo: 'N/A', tipo: 'Analítica', nivel: 2 },
-  { codigo: '5.1.1', nome: 'Despesa com Salários', grupo: 'Despesa', subgrupo: 'N/A', tipo: 'Analítica', nivel: 2 },
-  { codigo: '5.1.2', nome: 'Despesa com Aluguel', grupo: 'Despesa', subgrupo: 'N/A', tipo: 'Analítica', nivel: 2 },
-  { codigo: '5.1.3', nome: 'Despesa com Energia Elétrica', grupo: 'Despesa', subgrupo: 'N/A', tipo: 'Analítica', nivel: 2 },
-  { codigo: '5.1.4', nome: 'Despesa Financeira', grupo: 'Despesa', subgrupo: 'N/A', tipo: 'Analítica', nivel: 2 },
-  { codigo: '5.1.5', nome: 'Despesa com Material de Escritório', grupo: 'Despesa', subgrupo: 'N/A', tipo: 'Analítica', nivel: 2 },
-  { codigo: '5.2.1', nome: 'Despesa com Depreciação', grupo: 'Despesa', subgrupo: 'N/A', tipo: 'Analítica', nivel: 2 },
-  { codigo: '5.3.0', nome: 'Despesa com IRPJ', grupo: 'Despesa', subgrupo: 'N/A', tipo: 'Analítica', nivel: 2 },
-  { codigo: '6.0.1', nome: 'Receita de Vendas', grupo: 'Receita', subgrupo: 'N/A', tipo: 'Analítica', nivel: 2 },
-  { codigo: '6.0.2', nome: 'Receita de Serviços', grupo: 'Receita', subgrupo: 'N/A', tipo: 'Analítica', nivel: 2 },
-  { codigo: '6.0.3', nome: 'Receita Financeira', grupo: 'Receita', subgrupo: 'N/A', tipo: 'Analítica', nivel: 2 },
-  { codigo: '7.0.1', nome: 'Resultado do Exercício', grupo: 'Apuração do Resultado', subgrupo: 'N/A', tipo: 'Analítica', nivel: 2 },
-];
+import {
+  ContaContabil,
+  GrupoContabil,
+  PlanoContasService,
+  SubgrupoContabil,
+  TipoConta,
+} from '../../shared/services/plano-contas.service';
 
 @Component({
   selector: 'app-plano-contas',
   standalone: true,
-  imports: [Card, FormsModule],
+  imports: [Card, FormsModule, RouterLink],
   templateUrl: './plano-contas.html',
   styleUrl: './plano-contas.css',
 })
 export class PlanoContas {
+  private readonly planoService = inject(PlanoContasService);
+
   readonly grupos: GrupoContabil[] = [
     'Ativo',
     'Passivo',
@@ -99,8 +38,6 @@ export class PlanoContas {
     'Não Circulante',
     'N/A',
   ];
-
-  contas: ContaContabil[] = [...PLANO_PADRAO];
 
   filtros = {
     busca: '',
@@ -125,7 +62,7 @@ export class PlanoContas {
     const termo = this.filtrosAplicados.busca.trim().toLowerCase();
     const { grupo, tipo } = this.filtrosAplicados;
 
-    return this.contas.filter((conta) => {
+    return this.planoService.contas().filter((conta) => {
       const correspondeBusca =
         !termo ||
         conta.codigo.toLowerCase().includes(termo) ||
@@ -143,7 +80,7 @@ export class PlanoContas {
   }
 
   carregarPlanoPadrao(): void {
-    this.contas = [...PLANO_PADRAO];
+    this.planoService.restaurarPadrao();
     this.filtros = { busca: '', grupo: '', tipo: '' };
     this.aplicarFiltros();
   }
@@ -192,14 +129,7 @@ export class PlanoContas {
       nivel,
     };
 
-    const listaSemAnterior = this.codigoEmEdicao
-      ? this.contas.filter((c) => c.codigo !== this.codigoEmEdicao)
-      : this.contas.filter((c) => c.codigo !== codigo);
-
-    this.contas = [...listaSemAnterior, registro].sort((a, b) =>
-      a.codigo.localeCompare(b.codigo, 'pt-BR', { numeric: true }),
-    );
-
+    this.planoService.salvarConta(registro, this.codigoEmEdicao);
     this.fecharModalConta();
   }
 
@@ -217,51 +147,5 @@ export class PlanoContas {
     link.download = 'plano-de-contas.csv';
     link.click();
     URL.revokeObjectURL(url);
-  }
-
-  importarCsv(evento: Event): void {
-    const input = evento.target as HTMLInputElement;
-    const arquivo = input.files?.[0];
-    if (!arquivo) return;
-
-    const leitor = new FileReader();
-    leitor.onload = () => {
-      const texto = String(leitor.result ?? '');
-      const linhas = texto
-        .split(/\r?\n/)
-        .map((l) => l.trim())
-        .filter(Boolean);
-
-      const importadas: ContaContabil[] = [];
-      for (const linha of linhas.slice(1)) {
-        const colunas = linha.split(';').map((s) => s?.trim());
-        const [codigo, nome, grupo] = colunas;
-        const subgrupo = colunas.length >= 5 ? colunas[3] : 'N/A';
-        const tipo = colunas.length >= 5 ? colunas[4] : colunas[3];
-
-        if (!codigo || !nome) continue;
-
-        importadas.push({
-          codigo,
-          nome,
-          grupo: (this.grupos.includes(grupo as GrupoContabil)
-            ? grupo
-            : 'Ativo') as GrupoContabil,
-          subgrupo: (this.subgrupos.includes(subgrupo as SubgrupoContabil)
-            ? subgrupo
-            : 'N/A') as SubgrupoContabil,
-          tipo: tipo === 'Sintética' ? 'Sintética' : 'Analítica',
-          nivel: Math.max(0, codigo.split('.').length - 1),
-        });
-      }
-
-      if (importadas.length > 0) {
-        this.contas = importadas.sort((a, b) =>
-          a.codigo.localeCompare(b.codigo, 'pt-BR', { numeric: true }),
-        );
-      }
-      input.value = '';
-    };
-    leitor.readAsText(arquivo, 'utf-8');
   }
 }

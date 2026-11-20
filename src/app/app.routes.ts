@@ -18,6 +18,13 @@ export const routes: Routes = [
       { path: 'home', component: Home },
       { path: 'empresas', component: Empresas },
       {
+        path: 'plano-contas/importar',
+        loadComponent: () =>
+          import('./pages/importar-plano/importar-plano').then(
+            (m) => m.ImportarPlano,
+          ),
+      },
+      {
         path: 'plano-contas',
         loadComponent: () =>
           import('./pages/plano-contas/plano-contas').then(
