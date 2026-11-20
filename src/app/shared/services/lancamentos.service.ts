@@ -15,6 +15,7 @@ export interface Lancamento {
     resumo: string;
     valor: number;
     estorno?: boolean;
+    estornoDe?: string;
     notaEstoque?: string;
     partidas: Partida[];
 }
@@ -83,6 +84,54 @@ export class LancamentosService {
             (a, b) =>
                 b.data.localeCompare(a.data) || Number(b.numero) - Number(a.numero),
         );
+    }
+    buscarEstorno(empresaId: number, numeroOriginal: string): Lancamento | undefined {
+        return this.listar(empresaId).find(
+            (item) => item.estorno === true && item.estornoDe === numeroOriginal,
+        );
+    }
+
+    registrarEstorno(
+        empresaId: number,
+        numeroOriginal: string,
+        data: string,
+        motivo: string,
+    ): Lancamento | undefined {
+        const original = this.buscar(empresaId, numeroOriginal);
+        const justificativa = motivo.trim();
+
+        if (
+            !original ||
+            original.estorno ||
+            !data ||
+            data < original.data ||
+            !justificativa ||
+            this.buscarEstorno(empresaId, numeroOriginal)
+        ) {
+            return undefined;
+        }
+
+        const maiorNumero = this.listar(empresaId).reduce(
+            (maior, item) => Math.max(maior, Number(item.numero)),
+            0,
+        );
+
+        const estorno: Lancamento = {
+            numero: String(maiorNumero + 1).padStart(3, '0'),
+            data,
+            historico: `Estorno do lançamento #${original.numero} — ${justificativa}`,
+            resumo: `Reversão do lançamento #${original.numero}`,
+            valor: original.valor,
+            estorno: true,
+            estornoDe: original.numero,
+            partidas: original.partidas.map((partida) => ({
+                ...partida,
+                natureza: partida.natureza === 'Débito' ? 'Crédito' : 'Débito',
+            })),
+        };
+
+        this.adicionar(empresaId, estorno);
+        return estorno;
     }
 
     buscar(empresaId: number, numero: string): Lancamento | undefined {

@@ -1,0 +1,136 @@
+@let lancamentoOriginal = original;
+@let lancamentoEstorno = estorno;
+
+<header class="ld-cabecalho">
+  <div>
+    <small>FINANSYS / ESCRITURAÇÃO</small>
+    <h1>{{ lancamentoEstorno ? 'Livro Diário · estorno registrado' : 'Estornar lançamento' }}</h1>
+    <p>O lançamento original é preservado e o estorno fica identificado no Diário.</p>
+  </div>
+</header>
+
+@if (lancamentoOriginal && !lancamentoOriginal.estorno) {
+  @if (lancamentoEstorno) {
+    <form class="ld-filtros" (ngSubmit)="aplicarFiltros()">
+      <label>
+        Data inicial
+        <input type="date" name="inicio" [(ngModel)]="filtros.inicio" />
+      </label>
+
+      <label>
+        Data final
+        <input type="date" name="fim" [(ngModel)]="filtros.fim" />
+      </label>
+
+      <div class="ld-campo">
+        <span>Estornos</span>
+        <label class="ld-checkbox">
+          <input
+            type="checkbox"
+            name="exibirEstornos"
+            [(ngModel)]="filtros.exibirEstornos"
+          />
+          Exibir originais e estornos
+        </label>
+      </div>
+
+      <button class="ld-botao ld-filtrar" type="submit">Aplicar filtros</button>
+
+      @if (erroFiltro) {
+        <p class="ld-erro" role="alert">{{ erroFiltro }}</p>
+      }
+    </form>
+
+    <app-card titulo="Lançamentos vinculados">
+      <p class="estorno-sucesso" role="status">
+        Estorno contabilizado sob o nº #{{ lancamentoEstorno.numero }}.
+      </p>
+
+      <div class="ld-tabela-wrap">
+        <table class="ld-tabela estorno-tabela" aria-label="Original e estorno">
+          <thead>
+            <tr>
+              <th scope="col">Nº</th>
+              <th scope="col">Histórico</th>
+              <th scope="col">Situação</th>
+              <th scope="col">Valor</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (item of registros; track item.numero) {
+              <tr [class.ld-faixa]="!$even">
+                <th scope="row">
+                  <a
+                    class="ld-detalhe"
+                    [routerLink]="['/livro-diario', 'lancamentos', item.numero]"
+                  >
+                    #{{ item.numero }}
+                  </a>
+                </th>
+                <td>{{ item.historico }}</td>
+                <td>{{ item.estorno ? 'Estorno' : 'Original estornado' }}</td>
+                <td>{{ formatarValor(item.valor) }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="4">Nenhum registro encontrado com esses filtros.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </app-card>
+  } @else {
+    <app-card
+      [titulo]="'Lançamento #' + lancamentoOriginal.numero"
+      [descricao]="lancamentoOriginal.historico + ' · ' + formatarValor(lancamentoOriginal.valor)"
+    >
+      <form #formEstorno="ngForm" (ngSubmit)="confirmar()">
+        <div class="estorno-campos">
+          <label>
+            Data do estorno
+            <input
+              type="date"
+              name="dataEstorno"
+              [(ngModel)]="dataEstorno"
+              [min]="lancamentoOriginal.data"
+              required
+            />
+          </label>
+
+          <label>
+            Motivo do estorno
+            <input
+              type="text"
+              name="motivo"
+              [(ngModel)]="motivo"
+              placeholder="Ex. Pagamento registrado em duplicidade"
+              required
+            />
+          </label>
+        </div>
+
+        @if (erro) {
+          <p class="ld-erro" role="alert">{{ erro }}</p>
+        }
+
+        <button
+          class="ld-botao estorno-primario"
+          type="submit"
+          [disabled]="formEstorno.invalid || !motivo.trim()"
+        >
+          Confirmar estorno
+        </button>
+      </form>
+    </app-card>
+  }
+} @else {
+  <app-card titulo="Lançamento indisponível">
+    <p>O registro não pertence à empresa selecionada, não existe ou já é um estorno.</p>
+  </app-card>
+}
+
+<a class="ld-botao estorno-voltar" routerLink="/livro-diario">
+  Voltar ao Diário
+</a>
