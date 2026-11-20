@@ -11,7 +11,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 export class Sidebar {
   readonly itens: { nome: string; icone: string; rota: string | null }[] = [
     { nome: 'Visão geral', icone: '▦', rota: '/home' },
-    { nome: 'Plano de contas', icone: '▤', rota: null },
+    { nome: 'Plano de contas', icone: '▤', rota: '/plano-contas' },
     { nome: 'Livro Diário', icone: '≡', rota: '/livro-diario' },
     { nome: 'Livro Razão', icone: '◫', rota: '/livro-razao' },
     { nome: 'Relatórios', icone: '▧', rota: null },
