@@ -25,7 +25,44 @@ export class Exportacoes {
   private readonly parametros = toSignal(this.rota.queryParamMap, {
     initialValue: this.rota.snapshot.queryParamMap,
   });
+  formato: 'pdf' | 'xlsx' =
+    this.parametros().get('formato') === 'xlsx' ? 'xlsx' : 'pdf';
 
+  gerando = false;
+  erroExportacao = '';
+
+  private readonly moeda = new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  });
+
+  formatarCelula(valor: string | number): string {
+    return typeof valor === 'number' ? this.moeda.format(valor) : valor;
+  }
+
+  async gerarArquivo(): Promise<void> {
+    const relatorio = this.documento;
+    const empresa = this.empresa();
+
+    if (!empresa || !relatorio?.linhas.length || this.gerando) return;
+
+    this.erroExportacao = '';
+
+    if (this.formato === 'pdf') {
+      window.print();
+      return;
+    }
+
+    this.gerando = true;
+
+    try {
+      await this.exportacao.baixarExcel(relatorio, empresa.nomeFantasia, this.mes);
+    } catch {
+      this.erroExportacao = 'Não foi possível gerar o Excel. Tente novamente.';
+    } finally {
+      this.gerando = false;
+    }
+  }
   mes = '2026-11';
 
   get consolidado(): boolean {

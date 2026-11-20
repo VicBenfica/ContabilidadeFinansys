@@ -1,88 +1,87 @@
 @let relatorio = documento;
 
 <div class="exp-tela">
-  <header class="exp-cabecalho">
-    <small>FINANSYS / ESCRITURAÇÃO</small>
-    <h1>Exportações da empresa</h1>
-    <p>Confira o escopo e o formato do documento antes da exportação.</p>
-  </header>
+    <header class="exp-cabecalho">
+        <small>FINANSYS / ESCRITURAÇÃO</small>
+        <h1>{{ consolidado ? 'Exportações da empresa' : 'Exportar Livro Diário' }}</h1>
+        <p>Confira o escopo e o formato do documento antes da exportação.</p>
+    </header>
 
-  <app-card
-    titulo="Opções de exportação"
-    [descricao]="consolidado
+    <app-card titulo="Opções de exportação" [descricao]="consolidado
       ? 'PDF consolidado: Diário, Razão, Balancete, Balanço, DRE e DFC.'
-      : 'Resumo dos lançamentos do Livro Diário no período selecionado.'"
-  >
-    <form (ngSubmit)="imprimir()">
-      <div class="exp-campos">
-        <label>
-          Empresa
-          <input
-            type="text"
-            [value]="empresa()?.nomeFantasia ?? 'Nenhuma empresa selecionada'"
-            readonly
-          />
-        </label>
+      : 'Resumo dos lançamentos do Livro Diário no período selecionado.'">
+        <form (ngSubmit)="gerarArquivo()">
+            <div class="exp-campos">
+                <label>
+                    Empresa
+                    <input type="text" [value]="empresa()?.nomeFantasia ?? 'Nenhuma empresa selecionada'" readonly />
+                </label>
 
-        <label>
-          Período
-          <input type="month" name="mes" [(ngModel)]="mes" required />
-        </label>
+                <label>
+                    Período
+                    <input type="month" name="mes" [(ngModel)]="mes" required />
+                </label>
 
-        <label>
-          Formato
-          <input type="text" value="PDF" readonly />
-        </label>
-      </div>
+                <label>
+                    Formato
+                    @if (consolidado) {
+                    <input type="text" value="PDF" readonly />
+                    } @else {
+                    <select name="formato" [(ngModel)]="formato">
+                        <option value="pdf">PDF</option>
+                        <option value="xlsx">Excel (.xlsx)</option>
+                    </select>
+                    }
+                </label>
+            </div>
 
-      <div class="exp-acoes">
-        <a class="exp-botao" [routerLink]="consolidado ? '/home' : '/livro-diario'">
-          Voltar
-        </a>
+            <div class="exp-acoes">
+                <a class="exp-botao" [routerLink]="consolidado ? '/home' : '/livro-diario'">
+                    Voltar
+                </a>
 
-        <button
-          class="exp-botao exp-primario"
-          type="submit"
-          [disabled]="!relatorio || relatorio.linhas.length === 0"
-        >
-          {{ consolidado ? 'Gerar PDF consolidado' : 'Gerar PDF' }}
-        </button>
-      </div>
-
-      @if (consolidado) {
-        <p class="exp-nota">
-          O PDF consolidado ficará disponível quando os demais relatórios forem conectados.
-        </p>
-      } @else if (relatorio && relatorio.linhas.length === 0) {
-        <p class="exp-nota">Nenhum lançamento encontrado nesse período.</p>
-      }
-    </form>
-  </app-card>
+                <button class="exp-botao exp-primario" type="submit"
+                    [disabled]="!relatorio || relatorio.linhas.length === 0 || gerando">
+                    {{ gerando ? 'Gerando…' : consolidado ? 'Gerar PDF consolidado' : 'Gerar arquivo' }}
+                </button>
+            </div>
+            @if (erroExportacao) {
+            <p class="exp-nota" role="alert">{{ erroExportacao }}</p>
+            }
+            @if (consolidado) {
+            <p class="exp-nota">
+                O PDF consolidado ficará disponível quando os demais relatórios forem conectados.
+            </p>
+            } @else if (relatorio && relatorio.linhas.length === 0) {
+            <p class="exp-nota">Nenhum lançamento encontrado nesse período.</p>
+            }
+        </form>
+    </app-card>
 </div>
 
 @if (relatorio) {
-  <section class="exp-impressao">
+<section class="exp-impressao">
     <h1>{{ relatorio.titulo }}</h1>
     <p>{{ empresa()?.nomeFantasia }} · Período: {{ mes }}</p>
 
     <table>
-      <thead>
-        <tr>
-          @for (coluna of relatorio.colunas; track $index) {
-            <th scope="col">{{ coluna }}</th>
-          }
-        </tr>
-      </thead>
+        <thead>
+            <tr>
+                @for (coluna of relatorio.colunas; track $index) {
+                <th scope="col">{{ coluna }}</th>
+                }
+            </tr>
+        </thead>
 
-      <tbody>
-        @for (linha of relatorio.linhas; track $index) {
-          <tr>
-            @for (valor of linha; track $index) {
-              <td>{{ valor }}</td>
+        <tbody>
+            @for (linha of relatorio.linhas; track $index) {
+            <tr>
+                @for (valor of linha; track $index) {
+                <td>{{ formatarCelula(valor) }}</td>
+                }
+            </tr>
             }
-          </tr>
-        }
-      </tbody>
+        </tbody>
     </table>
-  </section>
+</section>
 }
