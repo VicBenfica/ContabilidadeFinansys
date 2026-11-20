@@ -1,0 +1,96 @@
+<header class="fs-page-header">
+  <small>FINANSYS / ESCRITURAÇÃO</small>
+  <h1>Empresas</h1>
+  <p>Cadastre uma empresa ou selecione uma já salva para continuar.</p>
+</header>
+
+<app-card
+  titulo="Nova empresa"
+  descricao="Os saldos, estoques e lançamentos são separados por empresa."
+>
+  <form #formEmpresa="ngForm" (ngSubmit)="salvarEmpresa(formEmpresa)">
+    <div class="fs-campos">
+      <label>
+        Razão social
+        <input
+          type="text"
+          name="razaoSocial"
+          [(ngModel)]="novaEmpresa.razaoSocial"
+          placeholder="Papelaria Aurora Ltda."
+          required
+        />
+      </label>
+
+      <label>
+        Nome fantasia
+        <input
+          type="text"
+          name="nomeFantasia"
+          [(ngModel)]="novaEmpresa.nomeFantasia"
+          placeholder="Papelaria Aurora"
+          required
+        />
+      </label>
+
+      <label>
+        CNPJ (opcional)
+        <input
+          type="text"
+          name="cnpj"
+          [(ngModel)]="novaEmpresa.cnpj"
+          placeholder="00.000.000/0000-00"
+        />
+      </label>
+    </div>
+
+    <button
+      class="fs-botao fs-primario"
+      type="submit"
+      [disabled]="formEmpresa.invalid"
+    >
+      Salvar empresa
+    </button>
+
+    <p class="empresa-mensagem" role="status">{{ mensagem }}</p>
+  </form>
+</app-card>
+
+<app-card
+  titulo="Minhas empresas"
+  descricao="Selecione a empresa que deseja abrir."
+>
+  <div class="fs-table-wrap">
+    <table class="fs-table" aria-label="Minhas empresas">
+      <thead>
+        <tr>
+          <th scope="col">Empresa</th>
+          <th scope="col">Situação</th>
+          <th scope="col">Ação</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (empresa of empresas(); track empresa.id) {
+          <tr>
+            <td class="empresa-nome">{{ empresa.nomeFantasia }}</td>
+            <td>{{ empresa.comMovimentacao ? 'Com movimentação' : 'Em configuração' }}</td>
+            <td>
+              <button
+                class="empresa-abrir"
+                type="button"
+                (click)="abrirEmpresa(empresa.id)"
+              >
+                {{ empresa.comMovimentacao ? 'Abrir empresa' : 'Continuar' }}
+                <span aria-hidden="true"> →</span>
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="3">Nenhuma empresa cadastrada.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</app-card>

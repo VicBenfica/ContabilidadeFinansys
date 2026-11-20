@@ -9,13 +9,13 @@ export const routes: Routes = [
     {
         path: '',
         component: AppLayout,
-        children: [{ path: 'home', component: Home },
-                   
+        children: [
+        { path: 'home', component: Home }, 
+        { path: 'empresas', component: Empresas }
         ],
     },
     { path: '', redirectTo: 'login', pathMatch: 'full' },
     { path: 'login', component: Login },
-    { path: 'cadastro', component: Cadastro }
-
+    { path: 'cadastro', component: Cadastro },
 
 ]
