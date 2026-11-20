@@ -6,10 +6,9 @@
   </div>
 
   <div class="pc-acoes">
-    <label class="fs-botao pc-upload">
+    <a class="fs-botao" routerLink="/plano-contas/importar">
       Importar CSV
-      <input type="file" accept=".csv" (change)="importarCsv($event)" hidden />
-    </label>
+    </a>
 
     <button class="fs-botao" type="button" (click)="exportarCsv()">
       Exportar CSV

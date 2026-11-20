@@ -1,0 +1,83 @@
+<header class="ip-cabecalho">
+  <div>
+    <small>FINANSYS / ESCRITURAÇÃO</small>
+    <h1>Importar plano de contas</h1>
+    <p>Confira as contas do arquivo antes de confirmar o cadastro.</p>
+  </div>
+
+  <a class="fs-botao ip-voltar" routerLink="/plano-contas">
+    Voltar ao plano
+  </a>
+</header>
+
+<app-card
+  titulo="1. Selecionar arquivo"
+  descricao="CSV em UTF-8 com código, nome, grupo e tipo. Valores separados por ponto e vírgula."
+>
+  <div class="ip-acoes">
+    <label class="fs-botao fs-primario ip-btn">
+      Selecionar CSV
+      <input type="file" accept=".csv" (change)="aoSelecionarCsv($event)" hidden />
+    </label>
+
+    <button class="fs-botao ip-btn" type="button" (click)="usarExemploCsv()">
+      Usar exemplo de CSV
+    </button>
+  </div>
+</app-card>
+
+@if (mensagemArquivo) {
+  <div class="ip-banner" role="status">
+    {{ mensagemArquivo }}
+  </div>
+}
+
+<app-card
+  titulo="2. Revisar e confirmar"
+  descricao="A prévia verifica hierarquia, códigos repetidos e campos obrigatórios."
+>
+  @if (previa.length > 0) {
+    <div class="fs-table-wrap">
+      <table class="fs-table ip-tabela" aria-label="Prévia de importação do plano de contas">
+        <thead>
+          <tr>
+            <th scope="col">Código</th>
+            <th scope="col">Conta</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Validação</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (item of previa; track $index) {
+            <tr>
+              <td class="ip-codigo">{{ item.codigo || '—' }}</td>
+              <td>{{ item.nome || '—' }}</td>
+              <td>{{ item.tipo }}</td>
+              <td>
+                <span [class.ip-invalida]="!item.valida">
+                  {{ item.status }}
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <p class="ip-vazio">Nenhuma linha encontrada no arquivo selecionado.</p>
+  }
+
+  <div class="ip-acoes ip-rodape-acoes">
+    <a class="fs-botao ip-btn" routerLink="/plano-contas">Cancelar</a>
+
+    <button
+      class="fs-botao fs-primario ip-btn"
+      type="button"
+      [disabled]="contasValidas.length === 0"
+      (click)="confirmarImportacao()"
+    >
+      Confirmar importação
+    </button>
+  </div>
+</app-card>

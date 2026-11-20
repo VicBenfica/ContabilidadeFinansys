@@ -1,0 +1,106 @@
+.ip-cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.ip-cabecalho small {
+  color: var(--fs-roxo);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+}
+
+.ip-cabecalho h1 {
+  margin: 4px 0;
+  font-size: 30px;
+  line-height: 1.2;
+}
+
+.ip-cabecalho p {
+  margin: 6px 0 0;
+  color: var(--fs-suave);
+  font-size: 13px;
+}
+
+.ip-voltar,
+.ip-btn {
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.ip-voltar:hover,
+.ip-btn:not(.fs-primario):hover {
+  background: #f8f5ff;
+  border-color: #d5c8eb;
+}
+
+.ip-btn.fs-primario:hover:not(:disabled) {
+  background: #52359b;
+}
+
+.ip-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.ip-banner {
+  margin-bottom: 16px;
+  padding: 13px 16px;
+  border-radius: 10px;
+  background: #ece4fa;
+  color: var(--fs-roxo);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+app-card .fs-table-wrap {
+  margin-top: 16px;
+}
+
+.ip-tabela th {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fs-texto);
+}
+
+.ip-tabela th:first-child {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+.ip-tabela th:last-child {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.ip-tabela td {
+  padding: 13px 12px;
+  font-size: 13px;
+}
+
+.ip-codigo {
+  color: var(--fs-roxo);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ip-invalida {
+  color: #b42318;
+  font-weight: 600;
+}
+
+.ip-vazio {
+  margin: 16px 0 4px;
+  color: var(--fs-suave);
+  font-size: 13px;
+}
+
+.ip-rodape-acoes {
+  margin-top: 20px;
+}
