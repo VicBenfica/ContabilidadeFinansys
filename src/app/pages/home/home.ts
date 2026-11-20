@@ -1,9 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { EmpresasService } from '../../shared/services/empresas.service';
+import { RouterLink } from '@angular/router';
+
 
 @Component({
   selector: 'app-home',
   standalone: true,
+  imports: [RouterLink],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
@@ -16,8 +19,11 @@ export class Home {
   readonly acoes = [
     { titulo: 'Registrar compra', icone: '↓' },
     { titulo: 'Registrar venda', icone: '↑' },
-    { titulo: 'Baixar PDF consolidado', icone: '⇩' },
-  ];
+    {
+      titulo: 'Baixar PDF consolidado',
+      icone: '⇩',
+      tipoExportacao: 'consolidado',
+    },];
 
   readonly lancamentos = [
     { id: '004', data: '16/11/2026', historico: 'Pagamento de despesa', tipo: 'Despesa', classe: 'despesa', valor: 25 },

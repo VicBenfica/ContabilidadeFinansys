@@ -10,8 +10,13 @@ export const routes: Routes = [
         path: '',
         component: AppLayout,
         children: [
-        { path: 'home', component: Home }, 
-        { path: 'empresas', component: Empresas }
+            { path: 'home', component: Home },
+            { path: 'empresas', component: Empresas },
+            {
+                path: 'exportacoes',
+                loadComponent: () =>
+                    import('./pages/exportacoes/exportacoes').then((m) => m.Exportacoes),
+            },
         ],
     },
     { path: '', redirectTo: 'login', pathMatch: 'full' },
