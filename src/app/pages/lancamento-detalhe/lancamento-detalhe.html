@@ -1,0 +1,108 @@
+@let lancamento = lancamentoDetalhe;
+
+<header class="ld-cabecalho">
+  <div>
+    <small>FINANSYS / ESCRITURAÇÃO</small>
+    <h1>Lançamento #{{ numeroDetalhe }}</h1>
+
+    @if (lancamento) {
+      <p><strong>Descrição:</strong> {{ lancamento.historico }}</p>
+
+      <p>
+        {{ formatarData(lancamento.data) }}
+        · {{ lancamento.estorno ? 'Estorno' : 'Contabilizado' }}
+      </p>
+    }
+  </div>
+
+  <a class="ld-botao ld-cancelar" routerLink="/livro-diario">
+    Voltar ao Diário
+  </a>
+</header>
+
+@if (lancamento) {
+  @let resumo = resumoDetalhe(lancamento);
+
+  <section class="ld-resumo-detalhe" aria-label="Resumo do lançamento">
+    <article>
+      <h2>{{ resumo.venda ? 'Valor da venda' : 'Débitos' }}</h2>
+      <strong>
+        {{ formatarValor(resumo.venda ? resumo.valorVenda : resumo.debitos) }}
+      </strong>
+    </article>
+
+    <article>
+      <h2>{{ resumo.venda ? 'Custo da mercadoria' : 'Créditos' }}</h2>
+      <strong>
+        {{ formatarValor(resumo.venda ? resumo.custoMercadoria : resumo.creditos) }}
+      </strong>
+    </article>
+
+    <article class="ld-resumo-destaque">
+      <h2>
+        {{ resumo.venda && resumo.diferenca === 0
+          ? 'Totais de cada lado'
+          : 'Diferença' }}
+      </h2>
+
+      <strong>
+        {{ formatarValor(
+          resumo.venda && resumo.diferenca === 0
+            ? resumo.debitos
+            : resumo.diferenca
+        ) }}
+      </strong>
+    </article>
+  </section>
+
+  <app-card
+    [titulo]="resumo.venda
+      ? 'Partidas contábeis da venda e da baixa'
+      : 'Partidas contábeis'"
+  >
+    <div class="ld-tabela-wrap">
+      <table
+        class="ld-tabela ld-tabela-detalhe"
+        aria-label="Partidas do lançamento"
+      >
+        <thead>
+          <tr>
+            <th scope="col">Código</th>
+            <th scope="col">Conta</th>
+            <th scope="col">Débito</th>
+            <th scope="col">Crédito</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (partida of lancamento.partidas; track $index) {
+            <tr [class.ld-faixa]="!$even">
+              <td class="ld-numero">{{ partida.codigo ?? '—' }}</td>
+              <td>{{ partida.conta }}</td>
+              <td>
+                {{ partida.natureza === 'Débito'
+                  ? formatarValor(partida.valor)
+                  : '—' }}
+              </td>
+              <td>
+                {{ partida.natureza === 'Crédito'
+                  ? formatarValor(partida.valor)
+                  : '—' }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </app-card>
+
+  @if (lancamento.notaEstoque) {
+    <p class="ld-totais ld-totais-ok">{{ lancamento.notaEstoque }}</p>
+  }
+} @else {
+  <app-card titulo="Lançamento não encontrado">
+    <p class="ld-vazio">
+      Esse lançamento não está disponível para a empresa selecionada.
+    </p>
+  </app-card>
+}

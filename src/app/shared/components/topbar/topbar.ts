@@ -1,5 +1,6 @@
-import { Component, input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { EmpresasService } from '../../services/empresas.service';
 
 @Component({
   selector: 'app-topbar',
@@ -10,4 +11,9 @@ import { RouterLink } from '@angular/router';
 })
 export class Topbar {
   readonly empresa = input('Selecionar empresa');
-}
+  readonly empresas = inject(EmpresasService);
+
+  selecionarEmpresa(id: number): void {
+    this.empresas.selecionar(id);
+  }
+} 

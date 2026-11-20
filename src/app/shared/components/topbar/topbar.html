@@ -1,19 +1,58 @@
-<header class="fs-topbar">
-  <span class="fs-topbar-titulo">Escrituração contábil</span>
+<header class="tb-barra">
+  <span class="tb-titulo">Escrituração contábil</span>
 
-  <div class="fs-topbar-acoes">
-    <div class="fs-topbar-empresa">
-      <span class="fs-topbar-label">Empresa</span>
+  <div class="tb-acoes">
+    <div class="tb-empresa">
+      <span class="tb-label">Empresa</span>
 
-      <a class="fs-botao" routerLink="/empresas">
-        {{ empresa() }}
-        <span aria-hidden="true">▾</span>
-      </a>
-      <a class="fs-botao" routerLink="/empresas">+ Adicionar empresa</a>
+      <details
+        #menuEmpresas
+        class="tb-seletor"
+        (keydown.escape)="menuEmpresas.open = false; botaoEmpresas.focus()"
+      >
+        <summary
+          #botaoEmpresas
+          class="tb-botao tb-gatilho"
+          [attr.aria-label]="'Empresa selecionada: ' + empresa()"
+        >
+          <span>{{ empresa() }}</span>
+        </summary>
+
+        <ul class="tb-lista" aria-label="Empresas cadastradas">
+          @for (item of empresas.lista(); track item.id) {
+            @let atual = empresas.selecionada()?.id === item.id;
+
+            <li>
+              <button
+                type="button"
+                class="tb-opcao"
+                [class.tb-opcao-atual]="atual"
+                [attr.aria-current]="atual ? 'true' : null"
+                (click)="selecionarEmpresa(item.id); menuEmpresas.open = false; botaoEmpresas.focus()"
+              >
+                {{ item.nomeFantasia }}
+                @if (atual) {
+                  <span aria-hidden="true">✓</span>
+                }
+              </button>
+            </li>
+          } @empty {
+            <li class="tb-vazio">Nenhuma empresa cadastrada.</li>
+          }
+        </ul>
+      </details>
     </div>
 
-    <button class="fs-botao fs-primario" type="button" disabled>
+    <a class="tb-botao" routerLink="/empresas">
+      + Adicionar empresa
+    </a>
+
+    <a
+      class="tb-botao tb-primario"
+      routerLink="/livro-diario"
+      [queryParams]="{ novo: '1' }"
+    >
       + Novo lançamento
-    </button>
+    </a>
   </div>
 </header>
