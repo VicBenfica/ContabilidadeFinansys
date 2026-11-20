@@ -1,0 +1,126 @@
+<header class="ld-cabecalho">
+    <div>
+        <small>FINANSYS / ESCRITURAÇÃO</small>
+        <h1>Livro Razão</h1>
+        <p>Consulte os débitos, créditos e a evolução do saldo por conta contábil.</p>
+    </div>
+    <div class="ld-acoes lr-exportar">
+        <button type="button" class="ld-botao" [disabled]="!relatorio || exportandoExcel" (click)="gerarPdf()">
+            Gerar PDF
+        </button>
+
+        <button type="button" class="ld-botao" [disabled]="!relatorio || exportandoExcel" (click)="exportarExcel()">
+            {{ exportandoExcel ? 'Gerando…' : 'Exportar Excel' }}
+        </button>
+    </div>@if (erroExportacao) {
+    <p class="ld-erro lr-erro-exportacao" role="alert">{{ erroExportacao }}</p>
+    }
+</header>
+
+@let opcoes = contas;
+
+<form class="ld-filtros lr-filtros" (ngSubmit)="aplicarFiltros()">
+    <label>
+        Conta contábil
+        <select name="conta" [(ngModel)]="filtros.conta" required>
+            <option value="">Selecione uma conta</option>
+            @for (conta of opcoes; track conta.chave) {
+            <option [value]="conta.chave">{{ conta.nome }}</option>
+            }
+        </select>
+    </label>
+
+    <label>
+        Data inicial
+        <input type="date" name="inicio" [(ngModel)]="filtros.inicio" required />
+    </label>
+
+    <label>
+        Data final
+        <input type="date" name="fim" [(ngModel)]="filtros.fim" required />
+    </label>
+
+    <button class="ld-botao ld-filtrar" type="submit" [disabled]="opcoes.length === 0">
+        Aplicar filtros
+    </button>
+
+    @if (erroFiltro) {
+    <p class="ld-erro" role="alert">{{ erroFiltro }}</p>
+    }
+</form>
+
+@if (relatorio; as razao) {
+<p class="lr-identificacao">
+    {{ nomeEmpresa }} · Conta: {{ razao.conta }} ·
+    {{ formatarData(razao.inicio) }} a {{ formatarData(razao.fim) }}
+</p>
+
+<section class="lr-resumo" aria-label="Resumo da conta">
+    <article>
+        <h2>Saldo inicial</h2>
+        <strong>{{ formatarSaldo(razao.saldoInicial) }}</strong>
+    </article>
+
+    <article>
+        <h2>Débitos no período</h2>
+        <strong>{{ formatarValor(razao.debitos) }}</strong>
+    </article>
+
+    <article>
+        <h2>Créditos no período</h2>
+        <strong>{{ formatarValor(razao.creditos) }}</strong>
+    </article>
+
+    <article class="lr-destaque">
+        <h2>Saldo final</h2>
+        <strong>{{ formatarSaldo(razao.saldoFinal) }}</strong>
+    </article>
+</section>
+
+<app-card [titulo]="'Movimentação da conta · ' + razao.conta">
+    @if (razao.movimentos.length) {
+    <div class="ld-tabela-wrap">
+        <table class="ld-tabela lr-tabela" aria-label="Movimentação da conta">
+            <thead>
+                <tr>
+                    <th scope="col">Nº</th>
+                    <th scope="col">Data</th>
+                    <th scope="col">Histórico</th>
+                    <th scope="col">Débito</th>
+                    <th scope="col">Crédito</th>
+                    <th scope="col">Saldo</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @for (item of razao.movimentos; track item.id) {
+                <tr [class.ld-faixa]="!$even">
+                    <th scope="row">
+                        <a class="ld-detalhe" [routerLink]="['/livro-diario', 'lancamentos', item.numero]">
+                            #{{ item.numero }}
+                        </a>
+                    </th>
+                    <td>{{ formatarData(item.data) }}</td>
+                    <td>{{ item.historico }}</td>
+                    <td>{{ item.debito ? formatarValor(item.debito) : '—' }}</td>
+                    <td>{{ item.credito ? formatarValor(item.credito) : '—' }}</td>
+                    <td><strong>{{ formatarSaldo(item.saldo) }}</strong></td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <p class="ld-nota">D indica saldo devedor e C indica saldo credor.</p>
+    } @else {
+    <p class="ld-vazio">Essa conta não teve movimentação no período selecionado.</p>
+    }
+</app-card>
+} @else {
+<app-card titulo="Movimentação por conta">
+    <p class="ld-vazio">
+        {{ opcoes.length
+        ? 'Selecione uma conta e aplique os filtros para consultar o Razão.'
+        : 'Nenhuma conta movimentada foi encontrada para a empresa selecionada.' }}
+    </p>
+</app-card>
+}

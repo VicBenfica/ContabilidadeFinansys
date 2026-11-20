@@ -1,0 +1,129 @@
+.lr-filtros {
+    grid-template-columns: minmax(0, 1.5fr) repeat(2, minmax(0, 1fr)) auto;
+}
+
+.lr-filtros select {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: 36px;
+    padding: 6px 9px;
+    border: 1px solid var(--fs-borda, #e7e0f0);
+    border-radius: 7px;
+    background: #fff;
+    color: var(--fs-texto, #211738);
+    font: inherit;
+    font-weight: 400;
+}
+
+.lr-resumo {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.lr-resumo article {
+    padding: 14px 16px;
+    border: 1px solid var(--fs-borda, #e7e0f0);
+    border-radius: 10px;
+    background: #fff;
+}
+
+.lr-resumo h2 {
+    margin: 0 0 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.lr-resumo strong {
+    font-size: 20px;
+}
+
+.lr-resumo .lr-destaque {
+    border-color: transparent;
+    background: var(--fs-roxo, #6041b0);
+    color: #fff;
+}
+
+.lr-tabela th:nth-child(n + 4),
+.lr-tabela td:nth-child(n + 4) {
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.lr-tabela a {
+    text-decoration: none;
+}
+
+.lr-tabela a:hover {
+    text-decoration: underline;
+}
+
+
+.ld-filtros>label,
+.ld-filtros .ld-campo,
+.ld-filtros input[type='date'],
+.ld-filtros select,
+.ld-filtros .ld-checkbox,
+.ld-filtros .ld-filtrar {
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.ld-filtros>label,
+.ld-filtros .ld-campo,
+.ld-filtros .ld-filtrar {
+    font-weight: 600;
+}
+
+.ld-filtros input[type='date'],
+.ld-filtros select,
+.ld-filtros .ld-checkbox {
+    font-weight: 400;
+}
+
+.lr-identificacao {
+    margin: 0 0 12px;
+    color: var(--fs-suave, #655979);
+    font-size: 12px;
+}
+
+@media (max-width: 850px) {
+
+    .lr-filtros,
+    .lr-resumo {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+
+    .lr-filtros,
+    .lr-resumo {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media print {
+
+    .lr-filtros,
+    .lr-exportar,
+    .lr-erro-exportacao {
+        display: none;
+    }
+
+    .ld-tabela-wrap {
+        overflow: visible;
+    }
+
+    .lr-tabela {
+        min-width: 0;
+    }
+
+    .lr-tabela tr {
+        break-inside: avoid;
+    }
+}

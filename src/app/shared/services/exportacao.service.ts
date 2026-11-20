@@ -46,24 +46,32 @@ export class ExportacaoService {
     async baixarExcel(
         documento: DocumentoExportacao,
         empresa: string,
-        mes: string,
+        periodo: string,
+        opcoes?: {
+            nomeArquivo: string;
+            larguras: number[];
+            colunasMonetarias: number[];
+        },
     ): Promise<void> {
         const { Workbook } = await import('exceljs');
         const arquivo = new Workbook();
         const planilha = arquivo.addWorksheet(documento.titulo);
 
         planilha.addRow(['Empresa', empresa]);
-        planilha.addRow(['Período', mes]);
-        planilha.addRow(documento.colunas);
+        planilha.addRow(['Período', periodo]); planilha.addRow(documento.colunas);
         planilha.addRows(documento.linhas);
 
         planilha.getRow(3).font = { bold: true };
         planilha.views = [{ state: 'frozen', ySplit: 3 }];
+        const larguras = opcoes?.larguras ?? [10, 14, 48, 12, 35, 16, 16];
 
-        const larguras = [10, 14, 48, 12, 35, 16, 16];
         larguras.forEach((largura, i) => {
             planilha.getColumn(i + 1).width = largura;
         });
+
+        for (const coluna of opcoes?.colunasMonetarias ?? [6, 7]) {
+            planilha.getColumn(coluna).numFmt = '"R$" #,##0.00';
+        }
 
         planilha.getColumn(6).numFmt = '"R$" #,##0.00';
         planilha.getColumn(7).numFmt = '"R$" #,##0.00';
@@ -77,8 +85,7 @@ export class ExportacaoService {
         const link = document.createElement('a');
 
         link.href = url;
-        link.download = `livro-diario-${mes}.xlsx`;
-        document.body.appendChild(link);
+        link.download = opcoes?.nomeArquivo ?? `livro-diario-${periodo}.xlsx`; document.body.appendChild(link);
         link.click();
         link.remove();
 
