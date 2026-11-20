@@ -18,6 +18,11 @@ export const routes: Routes = [
             { path: 'home', component: Home },
             { path: 'empresas', component: Empresas },
             {
+                path: 'livro-diario/exportar',
+                loadComponent: () =>
+                    import('./pages/exportacoes/exportacoes').then((m) => m.Exportacoes),
+            },
+            {
                 path: 'exportacoes',
                 loadComponent: () =>
                     import('./pages/exportacoes/exportacoes').then((m) => m.Exportacoes),

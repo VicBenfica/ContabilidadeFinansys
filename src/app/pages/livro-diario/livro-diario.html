@@ -1,4 +1,4 @@
-@if (!exibirFormulario) { 
+@if (!exibirFormulario) {
 <header class="ld-cabecalho">
     <div>
         <small>FINANSYS / ESCRITURAÇÃO</small>
@@ -6,17 +6,15 @@
         <p>Registro em ordem cronológica, com as partidas agrupadas por lançamento.</p>
     </div>
 
-<div class="ld-acoes">
-  <a
-    class="ld-botao"
-    routerLink="/exportacoes"
-    [queryParams]="{ tipo: 'diario' }"
-  >
-    Gerar PDF
-  </a>
+    <div class="ld-acoes">
+        <a class="ld-botao" routerLink="/livro-diario/exportar" [queryParams]="{ tipo: 'diario', formato: 'pdf' }">
+            Gerar PDF
+        </a>
 
-  <button class="ld-botao" type="button" disabled>Exportar Excel</button>
-</div>
+        <a class="ld-botao" routerLink="/livro-diario/exportar" [queryParams]="{ tipo: 'diario', formato: 'xlsx' }">
+            Exportar Excel
+        </a>
+    </div>
 </header>
 
 <form class="ld-filtros" (ngSubmit)="aplicarFiltros()">
@@ -76,17 +74,14 @@
                     <td>{{ item.historico }}</td>
                     <td>{{ item.resumo }}</td>
                     <td>{{ formatarValor(item.valor) }}</td>
-                        <td>
-      <a
-        class="ld-detalhe"
-        [routerLink]="['/livro-diario', 'lancamentos', item.numero]"
-      >
-        Ver partidas
-      </a>
-    </td>
-  </tr>
-  }
-</tbody>
+                    <td>
+                        <a class="ld-detalhe" [routerLink]="['/livro-diario', 'lancamentos', item.numero]">
+                            Ver partidas
+                        </a>
+                    </td>
+                </tr>
+                }
+            </tbody>
         </table>
     </div>
 
