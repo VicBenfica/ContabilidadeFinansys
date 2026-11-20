@@ -1,0 +1,238 @@
+:host {
+  display: block;
+  min-width: 0;
+  color: var(--fs-texto, #211738);
+}
+
+.home-header,
+.home-painel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.home-header {
+  margin-bottom: 24px;
+}
+
+.home-header p {
+  margin-bottom: 0;
+}
+
+.home-periodo {
+  padding: 10px 14px;
+  border: 1px solid var(--fs-borda, #e7e0f0);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.home-resumo,
+.home-acoes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.home-card,
+.home-painel {
+  padding: 16px;
+  border: 1px solid var(--fs-borda, #e7e0f0);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.home-card h2 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.home-card strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.home-card p {
+  margin: 6px 0 0;
+  color: var(--fs-suave, #655979);
+  font-size: 11px;
+}
+
+.home-resultado {
+  background: var(--fs-roxo, #6041b0);
+  border-color: transparent;
+  color: #fff;
+}
+
+.home-resultado p {
+  color: #efe8ff;
+}
+
+.home-painel {
+  margin-top: 14px;
+}
+
+.home-painel h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.home-acoes,
+.fs-table-wrap {
+  margin-top: 12px;
+}
+
+.home-acao {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid #ede7f5;
+  border-radius: 8px;
+  background: #f9f6fc;
+  color: inherit;
+  text-align: left;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.home-acao span {
+  display: grid;
+  flex: 0 0 26px;
+  height: 26px;
+  place-items: center;
+  border-radius: 6px;
+  background: #eee6fa;
+  color: var(--fs-roxo, #6041b0);
+}
+
+.home-link {
+  padding: 4px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.fs-table-wrap {
+  overflow-x: auto;
+}
+
+.home-tabela {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: left;
+  font-size: 12px;
+}
+
+.home-tabela th,
+.home-tabela td {
+  padding: 10px;
+}
+
+.home-tabela th {
+  background: #efe9fa;
+  color: var(--fs-suave, #655979);
+  font-weight: 600;
+}
+
+.home-tabela th:last-child,
+.home-tabela td:last-child {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.home-id {
+  color: var(--fs-roxo, #6041b0);
+  font-weight: 700;
+}
+
+.home-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #f5f0fa;
+  color: #584275;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.home-tag--venda {
+  background: #e5f5ed;
+  color: #246445;
+}
+
+.home-tag--despesa {
+  background: #fcecf0;
+  color: #8b3852;
+}
+
+@media (max-width: 720px) {
+  .home-resumo,
+  .home-acoes {
+    grid-template-columns: 1fr;
+  }
+}
+
+.home-configuracao p,
+.home-vazio p {
+  margin: 6px 0 0;
+  color: var(--fs-suave, #655979);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.home-config-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.home-config-botao {
+  padding: 9px 14px;
+  border: 1px solid var(--fs-borda, #e7e0f0);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--fs-texto, #211738);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.home-config-primario {
+  border-color: transparent;
+  background: var(--fs-roxo, #6041b0);
+  color: #fff;
+}
+
+.home-config-botao:disabled {
+  cursor: not-allowed;
+}
+
+.home-configuracao .home-config-nota {
+  margin-top: 18px;
+  font-size: 11px;
+}
+
+.home-vazio {
+  display: grid;
+  align-content: center;
+  min-height: 90px;
+  text-align: center;
+}
+
+.home-vazio h2 {
+  font-size: 14px;
+}

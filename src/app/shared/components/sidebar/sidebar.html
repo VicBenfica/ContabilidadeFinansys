@@ -1,0 +1,31 @@
+<aside class="fs-sidebar">
+  <a routerLink="/empresas" class="fs-brand" aria-label="Voltar para Empresas">
+    <img
+      src="logoFinanSysBranco.png"
+      alt="FinanSys — Sistema Contábil"
+    />
+  </a>
+
+  <nav class="fs-nav" aria-labelledby="fs-nav-title">
+    <p id="fs-nav-title" class="fs-nav-label">Área de trabalho</p>
+
+    @for (item of itens; track item.nome) {
+      @if (item.rota) {
+        <a
+          class="fs-nav-item"
+          [routerLink]="item.rota"
+          routerLinkActive="fs-active"
+          ariaCurrentWhenActive="page"
+        >
+          <span class="fs-nav-icon" aria-hidden="true">{{ item.icone }}</span>
+          <span>{{ item.nome }}</span>
+        </a>
+      } @else {
+        <span class="fs-nav-item fs-nav-pendente">
+          <span class="fs-nav-icon" aria-hidden="true">{{ item.icone }}</span>
+          <span>{{ item.nome }}</span>
+        </span>
+      }
+    }
+  </nav>
+</aside>

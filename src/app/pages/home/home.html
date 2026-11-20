@@ -1,0 +1,129 @@
+<header class="fs-page-header home-header">
+    <div>
+        <small>
+            FINANSYS / {{ temMovimentacao ? 'VISÃO CONTÁBIL' : 'PRIMEIROS PASSOS' }}
+        </small>
+
+        <h1>Visão geral</h1>
+
+        <p>
+            {{ temMovimentacao
+            ? 'Acompanhe o resultado e os registros contábeis da sua empresa.'
+            : 'Prepare a empresa para registrar suas primeiras operações.' }}
+        </p>
+    </div>
+
+    <span class="home-periodo">{{ periodo }}</span>
+</header>
+
+<section class="home-resumo" aria-label="Resumo financeiro do período">
+    <article class="home-card">
+        <h2>Receitas</h2>
+        <strong>{{ formatarValor(temMovimentacao ? receitas : 0) }}</strong>
+        <p>Receitas contabilizadas</p>
+    </article>
+
+    <article class="home-card">
+        <h2>Custos e despesas</h2>
+        <strong>{{ formatarValor(temMovimentacao ? custosEDespesas : 0) }}</strong>
+        <p>CMV e despesas do período</p>
+    </article>
+
+    <article class="home-card" [class.home-resultado]="temMovimentacao">
+        <h2>Resultado do período</h2>
+        <strong>{{ formatarValor(temMovimentacao ? resultado : 0) }}</strong>
+
+        @if (temMovimentacao) {
+        <p>
+            {{ resultado < 0 ? 'Prejuízo no período' : resultado> 0 ? 'Lucro no período'
+                : 'Sem lucro ou prejuízo no período' }}
+        </p>
+        } @else {
+        <p>Sem movimentação</p>
+        }
+    </article>
+</section>
+
+<section class="home-painel" aria-labelledby="home-acoes">
+    <h2 id="home-acoes">Ações rápidas</h2>
+
+    <div class="home-acoes">
+        @for (acao of acoes; track acao.titulo) {
+        <button type="button" class="home-acao" disabled>
+            <span aria-hidden="true">{{ acao.icone }}</span>
+            {{ acao.titulo }}
+        </button>
+        }
+    </div>
+</section>
+
+@if (temMovimentacao) {
+
+
+<section class="home-painel" aria-labelledby="home-lancamentos">
+    <div class="home-painel-header">
+        <h2 id="home-lancamentos">Últimos lançamentos</h2>
+        <button type="button" class="home-link" disabled>Ver Livro Diário →</button>
+    </div>
+
+    <div class="fs-table-wrap">
+        <table class="home-tabela" aria-labelledby="home-lancamentos">
+            <thead>
+                <tr>
+                    <th scope="col">Nº</th>
+                    <th scope="col">Data</th>
+                    <th scope="col">Histórico</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">Valor</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of lancamentos; track item.id) {
+                <tr>
+                    <td class="home-id">#{{ item.id }}</td>
+                    <td>{{ item.data }}</td>
+                    <td>{{ item.historico }}</td>
+                    <td>
+                        <span class="home-tag" [class]="'home-tag home-tag--' + item.classe">
+                            {{ item.tipo }}
+                        </span>
+                    </td>
+                    <td>{{ formatarValor(item.valor) }}</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>} @else {
+<section class="home-painel home-configuracao" aria-labelledby="home-config-titulo">
+    <h2 id="home-config-titulo">Configure sua empresa</h2>
+
+    <p>
+        Escolha como começar o plano de contas.
+        Registre saldos de abertura apenas se houver.
+    </p>
+
+    <div class="home-config-acoes">
+        <button type="button" class="home-config-botao home-config-primario" disabled>
+            Carregar plano padrão
+        </button>
+
+        <button type="button" class="home-config-botao" disabled>
+            Importar plano de contas
+        </button>
+
+        <button type="button" class="home-config-botao" disabled>
+            Registrar balancete inicial
+        </button>
+    </div>
+
+    <p class="home-config-nota">
+        O balancete inicial é opcional para empresas sem saldos de abertura.
+    </p>
+</section>
+
+<section class="home-painel home-vazio" aria-labelledby="home-vazio-titulo">
+    <h2 id="home-vazio-titulo">Nenhum lançamento por enquanto</h2>
+    <p>Os registros desta empresa aparecerão aqui após a primeira contabilização.</p>
+</section>
+}

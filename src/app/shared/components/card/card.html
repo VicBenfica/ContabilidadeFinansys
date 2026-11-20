@@ -1,0 +1,9 @@
+<section class="fs-card">
+  <h2>{{ titulo() }}</h2>
+
+  @if (descricao()) {
+    <p class="fs-card-descricao">{{ descricao() }}</p>
+  }
+
+  <ng-content></ng-content>
+</section>
