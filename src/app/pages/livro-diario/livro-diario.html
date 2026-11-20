@@ -1,14 +1,22 @@
-@if (!exibirFormulario) { <header class="ld-cabecalho">
+@if (!exibirFormulario) { 
+<header class="ld-cabecalho">
     <div>
         <small>FINANSYS / ESCRITURAÇÃO</small>
         <h1>Livro Diário</h1>
         <p>Registro em ordem cronológica, com as partidas agrupadas por lançamento.</p>
     </div>
 
-    <div class="ld-acoes">
-        <button class="ld-botao" type="button" disabled>Gerar PDF</button>
-        <button class="ld-botao" type="button" disabled>Exportar Excel</button>
-    </div>
+<div class="ld-acoes">
+  <a
+    class="ld-botao"
+    routerLink="/exportacoes"
+    [queryParams]="{ tipo: 'diario' }"
+  >
+    Gerar PDF
+  </a>
+
+  <button class="ld-botao" type="button" disabled>Exportar Excel</button>
+</div>
 </header>
 
 <form class="ld-filtros" (ngSubmit)="aplicarFiltros()">
@@ -68,30 +76,17 @@
                     <td>{{ item.historico }}</td>
                     <td>{{ item.resumo }}</td>
                     <td>{{ formatarValor(item.valor) }}</td>
-                    <td>
-                        <a class="ld-detalhe" [routerLink]="['/livro-diario', 'lancamentos', item.numero]">
-                            Ver partidas
-                        </a>
-                    </td>
-                </tr>
-
-                @if (lancamentoAberto === item.numero) {
-                <tr class="ld-partidas">
-                    <td colspan="6">
-                        <strong>Partidas do lançamento #{{ item.numero }}</strong>
-                        <ul>
-                            @for (partida of item.partidas; track $index) {
-                            <li>
-                                {{ partida.natureza }} · {{ partida.conta }} ·
-                                {{ formatarValor(partida.valor) }}
-                            </li>
-                            }
-                        </ul>
-                    </td>
-                </tr>
-                }
-                }
-            </tbody>
+                        <td>
+      <a
+        class="ld-detalhe"
+        [routerLink]="['/livro-diario', 'lancamentos', item.numero]"
+      >
+        Ver partidas
+      </a>
+    </td>
+  </tr>
+  }
+</tbody>
         </table>
     </div>
 
@@ -202,7 +197,7 @@
     </p>
 
     <div class="ld-acoes">
-        <a class="ld-botao ld-cancelar" [routerLink]="temMovimentacao ? '/livro-diario' : '/visao-geral'"
+        <a class="ld-botao ld-cancelar" [routerLink]="temMovimentacao ? '/livro-diario' : '/home'"
             [queryParams]="{ novo: null }" queryParamsHandling="merge">
             Cancelar
         </a>

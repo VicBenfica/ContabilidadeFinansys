@@ -49,10 +49,17 @@
 
     <div class="home-acoes">
         @for (acao of acoes; track acao.titulo) {
+        @if (acao.tipoExportacao) {
+        <a class="home-acao" routerLink="/exportacoes" [queryParams]="{ tipo: acao.tipoExportacao }">
+            <span aria-hidden="true">{{ acao.icone }}</span>
+            {{ acao.titulo }}
+        </a>
+        } @else {
         <button type="button" class="home-acao" disabled>
             <span aria-hidden="true">{{ acao.icone }}</span>
             {{ acao.titulo }}
         </button>
+        }
         }
     </div>
 </section>
@@ -63,7 +70,9 @@
 <section class="home-painel" aria-labelledby="home-lancamentos">
     <div class="home-painel-header">
         <h2 id="home-lancamentos">Últimos lançamentos</h2>
-        <button type="button" class="home-link" disabled>Ver Livro Diário →</button>
+        <a class="home-link" routerLink="/livro-diario">
+            Ver Livro Diário →
+        </a>
     </div>
 
     <div class="fs-table-wrap">
