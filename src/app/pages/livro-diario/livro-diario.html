@@ -1,0 +1,214 @@
+@if (!exibirFormulario) { <header class="ld-cabecalho">
+    <div>
+        <small>FINANSYS / ESCRITURAÇÃO</small>
+        <h1>Livro Diário</h1>
+        <p>Registro em ordem cronológica, com as partidas agrupadas por lançamento.</p>
+    </div>
+
+    <div class="ld-acoes">
+        <button class="ld-botao" type="button" disabled>Gerar PDF</button>
+        <button class="ld-botao" type="button" disabled>Exportar Excel</button>
+    </div>
+</header>
+
+<form class="ld-filtros" (ngSubmit)="aplicarFiltros()">
+    <label>
+        Data inicial
+        <input type="date" name="inicio" [(ngModel)]="filtros.inicio" />
+    </label>
+
+    <label>
+        Data final
+        <input type="date" name="fim" [(ngModel)]="filtros.fim" />
+    </label>
+
+    <div class="ld-campo">
+        <span>Estornos</span>
+        <label class="ld-checkbox">
+            <input type="checkbox" name="estornos" [(ngModel)]="filtros.exibirEstornos" />
+            Exibir originais e estornos
+        </label>
+    </div>
+
+    <button class="ld-botao ld-filtrar" type="submit">Aplicar filtros</button>
+
+    @if (erroFiltro) {
+    <p class="ld-erro" role="alert">{{ erroFiltro }}</p>
+    }
+</form>
+
+@let registros = lancamentos;
+
+<app-card [titulo]="periodo + ' · ' + registros.length +
+      (registros.length === 1 ? ' lançamento' : ' lançamentos')">
+    @if (registros.length > 0) {
+    <div class="ld-tabela-wrap">
+        <table class="ld-tabela" aria-label="Lançamentos do Livro Diário">
+            <thead>
+                <tr>
+                    <th scope="col">Nº</th>
+                    <th scope="col">Data</th>
+                    <th scope="col">Histórico</th>
+                    <th scope="col">Débitos / créditos</th>
+                    <th scope="col">Valor da operação</th>
+                    <th scope="col">Ação</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @for (item of registros; track item.numero) {
+                <tr [class.ld-faixa]="!$even">
+                    <th scope="row">
+                        <a class="ld-detalhe" [routerLink]="['/livro-diario', 'lancamentos', item.numero]"
+                            [attr.aria-label]="'Abrir lançamento ' + item.numero">
+                            #{{ item.numero }}
+                        </a>
+                    </th>
+                    <td>{{ formatarData(item.data) }}</td>
+                    <td>{{ item.historico }}</td>
+                    <td>{{ item.resumo }}</td>
+                    <td>{{ formatarValor(item.valor) }}</td>
+                    <td>
+                        <a class="ld-detalhe" [routerLink]="['/livro-diario', 'lancamentos', item.numero]">
+                            Ver partidas
+                        </a>
+                    </td>
+                </tr>
+
+                @if (lancamentoAberto === item.numero) {
+                <tr class="ld-partidas">
+                    <td colspan="6">
+                        <strong>Partidas do lançamento #{{ item.numero }}</strong>
+                        <ul>
+                            @for (partida of item.partidas; track $index) {
+                            <li>
+                                {{ partida.natureza }} · {{ partida.conta }} ·
+                                {{ formatarValor(partida.valor) }}
+                            </li>
+                            }
+                        </ul>
+                    </td>
+                </tr>
+                }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <p class="ld-nota">
+        A venda aparece uma vez no Diário. A receita e a baixa de estoque
+        ficam no mesmo lançamento.
+    </p>
+    } @else {
+    <p class="ld-vazio">Nenhum lançamento encontrado no período selecionado.</p>
+    }
+</app-card>
+} @else {
+<header class="ld-cabecalho">
+    <div>
+        <small>FINANSYS / ESCRITURAÇÃO</small>
+        <h1>Novo lançamento</h1>
+        <p>Informe a data e o histórico, depois distribua o valor entre as partidas.</p>
+    </div>
+</header>
+
+<form (ngSubmit)="contabilizar()">
+    <app-card titulo="Dados do lançamento"
+        descricao="O número de registro é atribuído automaticamente ao contabilizar.">
+        <div class="ld-novo-dados">
+            <label>
+                Data do lançamento
+                <input type="date" name="data" [(ngModel)]="dataLancamento" required />
+            </label>
+
+            <label>
+                Histórico / descrição
+                <input type="text" name="historico" [(ngModel)]="historicoNovo"
+                    placeholder="Ex. Pagamento conforme NF 1234" required />
+            </label>
+        </div>
+    </app-card>
+
+    <app-card titulo="Partidas contábeis">
+        <div class="ld-tabela-wrap">
+            <table class="ld-tabela ld-edicao" aria-label="Partidas contábeis">
+                <thead>
+                    <tr>
+                        <th scope="col">Natureza</th>
+                        <th scope="col">Conta contábil</th>
+                        <th scope="col">Valor</th>
+                        <th scope="col">Ação</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @for (linha of partidasNovas; track linha.id) {
+                    <tr [class.ld-faixa]="!$even">
+                        <td>
+                            <select [name]="'natureza-' + linha.id"
+                                [attr.aria-label]="'Natureza da partida ' + ($index + 1)" [(ngModel)]="linha.natureza">
+                                <option value="Débito">Débito</option>
+                                <option value="Crédito">Crédito</option>
+                            </select>
+                        </td>
+
+                        <td>
+                            <input type="text" [name]="'conta-' + linha.id"
+                                [attr.aria-label]="'Conta contábil da partida ' + ($index + 1)"
+                                [(ngModel)]="linha.conta" placeholder="Ex. Caixa" required />
+                        </td>
+
+                        <td>
+                            <input type="number" min="0.01" step="0.01" [name]="'valor-' + linha.id"
+                                [attr.aria-label]="'Valor da partida ' + ($index + 1)" [(ngModel)]="linha.valor"
+                                placeholder="0,00" required />
+                        </td>
+
+                        <td>
+                            <button class="ld-detalhe" type="button" [disabled]="partidasNovas.length <= 2"
+                                (click)="removerPartida(linha.id)">
+                                Remover
+                            </button>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="ld-acoes ld-novo-acoes">
+            <button class="ld-botao" type="button" (click)="adicionarPartida()">
+                + Adicionar partida
+            </button>
+
+            <button class="ld-botao" type="button" [attr.aria-expanded]="exibirExemplo"
+                (click)="exibirExemplo = !exibirExemplo">
+                {{ exibirExemplo ? 'Ocultar exemplo' : 'Ver exemplo de validação' }}
+            </button>
+        </div>
+
+        @if (exibirExemplo) {
+        <p class="ld-nota">
+            Para um pagamento de R$ 25,00, debite R$ 25,00 em Despesas operacionais
+            e credite R$ 25,00 em Caixa. A diferença deve ficar em R$ 0,00.
+        </p>
+        }
+    </app-card>
+
+    <p class="ld-totais" [class.ld-totais-ok]="debitosCentavos > 0 && diferencaCentavos === 0" aria-live="polite">
+        Débitos {{ formatarValor(debitosCentavos / 100) }}
+        · Créditos {{ formatarValor(creditosCentavos / 100) }}
+        · Diferença {{ formatarValor(diferencaCentavos / 100) }}
+    </p>
+
+    <div class="ld-acoes">
+        <a class="ld-botao ld-cancelar" [routerLink]="temMovimentacao ? '/livro-diario' : '/visao-geral'"
+            [queryParams]="{ novo: null }" queryParamsHandling="merge">
+            Cancelar
+        </a>
+        <button class="ld-botao ld-contabilizar" type="submit" [disabled]="!podeContabilizar">
+            Contabilizar lançamento
+        </button>
+    </div>
+</form>
+}
