@@ -1,0 +1,147 @@
+/* Cabeçalho da página */
+.fs-page-header {
+  margin-bottom: 22px;
+}
+
+.fs-page-header small {
+  color: var(--fs-roxo, #6041b0);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+}
+
+.fs-page-header h1 {
+  margin: 4px 0;
+  color: var(--fs-texto, #211738);
+  font-size: 30px;
+}
+
+.fs-page-header p {
+  margin: 6px 0 0;
+  color: var(--fs-suave, #655979);
+  font-size: 13px;
+}
+
+/* Formulário de cadastro */
+.fs-campos {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 0.9fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.fs-campos label {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  color: var(--fs-suave, #655979);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.fs-campos input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid var(--fs-borda, #e7e0f0);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--fs-texto, #211738);
+  font: inherit;
+  font-weight: 400;
+}
+
+.fs-campos input:focus-visible,
+.fs-botao:focus-visible,
+.empresa-abrir:focus-visible {
+  outline: 2px solid var(--fs-roxo, #6041b0);
+  outline-offset: 2px;
+}
+
+.fs-botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fs-primario {
+  background: var(--fs-roxo, #6041b0);
+  color: #fff;
+}
+
+.fs-botao:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.empresa-mensagem {
+  margin: 8px 0 0;
+  color: var(--fs-suave, #655979);
+  font-size: 12px;
+}
+
+.empresa-mensagem:empty {
+  margin: 0;
+}
+
+/* Tabela de empresas */
+.fs-table-wrap {
+  overflow-x: auto;
+  border-radius: 6px;
+}
+
+.fs-table {
+  width: 100%;
+  min-width: 430px;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.fs-table th,
+.fs-table td {
+  padding: 10px 12px;
+}
+
+.fs-table th {
+  background: #f0eafb;
+  color: var(--fs-suave, #655979);
+  font-weight: 600;
+}
+
+.fs-table tbody tr:nth-child(even) {
+  background: #faf8fe;
+}
+
+.empresa-nome {
+  color: var(--fs-roxo, #6041b0);
+  font-weight: 600;
+}
+
+.empresa-abrir {
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.empresa-abrir:hover {
+  color: var(--fs-roxo, #6041b0);
+  text-decoration: underline;
+}
+
+@media (max-width: 720px) {
+  .fs-campos {
+    grid-template-columns: 1fr;
+  }
+}

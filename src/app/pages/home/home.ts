@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { EmpresasService } from '../../shared/services/empresas.service';
 
 @Component({
   selector: 'app-home',
@@ -30,9 +31,11 @@ export class Home {
     currency: 'BRL',
   });
 
-  
+
+  private readonly empresasService = inject(EmpresasService);
+
   get temMovimentacao(): boolean {
-    return this.lancamentos.length > 0;
+    return this.empresasService.selecionada()?.comMovimentacao ?? false;
   }
   formatarValor(valor: number): string {
     return this.moeda.format(valor);

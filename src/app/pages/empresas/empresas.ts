@@ -1,60 +1,51 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { FormsModule, NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
+
 import { Card } from '../../shared/components/card/card';
+import {
+  DadosEmpresa,
+  EmpresasService,
+} from '../../shared/services/empresas.service';
 
 @Component({
   selector: 'app-empresas',
-  imports: [Card],
-  template: `
-    <header class="fs-page-header">
-      <small>FINANSYS / ESCRITURAÇÃO</small>
-      <h1>Empresas</h1>
-      <p>Cadastre uma empresa ou selecione uma já salva para continuar.</p>
-    </header>
-
-    <app-card titulo="Nova empresa"
-              descricao="Os saldos e lançamentos são separados por empresa.">
-      <div class="fs-campos">
-        <label>
-          Razão social
-          <input type="text" placeholder="Papelaria Aurora Ltda.">
-        </label>
-        <label>
-          Nome fantasia
-          <input type="text" placeholder="Papelaria Aurora">
-        </label>
-        <label>
-          CNPJ (opcional)
-          <input type="text" inputmode="numeric" placeholder="00.000.000/0000-00">
-        </label>
-      </div>
-
-      <button type="button" class="fs-botao fs-primario" disabled>
-        Salvar empresa
-      </button>
-    </app-card>
-
-    <app-card titulo="Minhas empresas"
-              descricao="Selecione a empresa que deseja abrir.">
-      <div class="fs-table-wrap">
-        <table class="fs-table">
-          <thead>
-            <tr><th>Empresa</th><th>Situação</th><th>Ação</th></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Papelaria Aurora</td>
-              <td>Com movimentação</td>
-              <td><button type="button" disabled>Abrir empresa →</button></td>
-            </tr>
-            <tr>
-              <td>Papelaria Horizonte</td>
-              <td>Em configuração</td>
-              <td><button type="button" disabled>Continuar →</button></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </app-card>
-  `,
+  imports: [Card, FormsModule],
+  templateUrl: './empresas.html',
+  styleUrl: './empresas.css',
 })
-export class Empresas {}
+export class Empresas {
+  private readonly router = inject(Router);
+  private readonly empresasService = inject(EmpresasService);
+
+  readonly empresas = this.empresasService.lista;
+  mensagem = '';
+
+  novaEmpresa: DadosEmpresa = {
+    razaoSocial: '',
+    nomeFantasia: '',
+    cnpj: '',
+  };
+
+  salvarEmpresa(formulario: NgForm): void {
+    const razaoSocial = this.novaEmpresa.razaoSocial.trim();
+    const nomeFantasia = this.novaEmpresa.nomeFantasia.trim();
+
+    if (formulario.invalid || !razaoSocial || !nomeFantasia) return;
+
+    this.empresasService.cadastrar({
+      razaoSocial,
+      nomeFantasia,
+      cnpj: this.novaEmpresa.cnpj.trim(),
+    });
+
+    this.novaEmpresa = { razaoSocial: '', nomeFantasia: '', cnpj: '' };
+    formulario.resetForm(this.novaEmpresa);
+    this.mensagem = `${nomeFantasia} foi cadastrada.`;
+  }
+
+  abrirEmpresa(id: number): void {
+    this.empresasService.selecionar(id);
+    void this.router.navigate(['/visao-geral']);
+  }
+}
