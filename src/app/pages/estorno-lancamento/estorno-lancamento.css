@@ -1,0 +1,61 @@
+.estorno-campos {
+  display: grid;
+  grid-template-columns: minmax(140px, 1fr) minmax(0, 2fr);
+  gap: 12px;
+  max-width: 680px;
+  margin-bottom: 14px;
+}
+
+.estorno-campos label {
+  display: grid;
+  gap: 5px;
+  color: var(--fs-suave, #655979);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.estorno-campos input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid var(--fs-borda, #e7e0f0);
+  border-radius: 7px;
+  color: var(--fs-texto, #211738);
+  font: inherit;
+  font-weight: 400;
+}
+
+.estorno-primario {
+  background: var(--fs-roxo, #6041b0);
+  color: #fff;
+}
+
+.estorno-sucesso {
+  margin: 12px 0;
+  padding: 10px 12px;
+  border-radius: 7px;
+  background: #e6f5ed;
+  color: #276749;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.estorno-tabela {
+  min-width: 460px;
+}
+
+.estorno-voltar {
+  display: inline-block;
+}
+
+.estorno-voltar,
+.estorno-tabela a {
+  text-decoration: none;
+}
+
+@media (max-width: 620px) {
+  .estorno-campos {
+    grid-template-columns: 1fr;
+  }
+}
