@@ -1,0 +1,91 @@
+:host {
+  display: block;
+  min-width: 0;
+  background: var(--fs-menu, #25163f);
+}
+
+.fs-sidebar {
+  box-sizing: border-box;
+  padding: 26px 14px 20px;
+  color: #e8ddf3;
+}
+
+.fs-brand {
+  display: block;
+  width: 138px;
+  max-width: calc(100% - 2px);
+  margin: 0 0 27px 2px;
+}
+
+.fs-brand img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.fs-nav {
+  display: grid;
+  gap: 7px;
+}
+
+.fs-nav-label {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #d8c9ed;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.fs-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 38px;
+  padding: 0 10px;
+  border-radius: 8px;
+  color: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-decoration: none;
+}
+
+.fs-nav-icon {
+  flex: 0 0 16px;
+  color: #c9b7d9;
+  font-size: 14px;
+  line-height: 1;
+  text-align: center;
+}
+
+.fs-nav-pendente {
+  cursor: default;
+}
+
+a.fs-nav-item:hover {
+  background: #362451;
+}
+
+.fs-nav-item.fs-active {
+  background: #4d3276;
+  color: #fff;
+}
+
+.fs-nav-item.fs-active .fs-nav-icon {
+  color: #ff75af;
+}
+
+.fs-nav-item:focus-visible,
+.fs-brand:focus-visible {
+  outline: 2px solid #ff75af;
+  outline-offset: 2px;
+}
+
+@media (max-width: 720px) {
+  .fs-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

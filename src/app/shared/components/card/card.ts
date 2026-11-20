@@ -2,17 +2,11 @@ import { Component, input } from '@angular/core';
 
 @Component({
   selector: 'app-card',
-  template: `
-    <section class="fs-card">
-      <h2>{{ titulo() }}</h2>
-      @if (descricao()) {
-        <p>{{ descricao() }}</p>
-      }
-      <ng-content />
-    </section>
-  `,
+  standalone: true,
+  templateUrl: './card.html',
+  styleUrl: './card.css',
 })
 export class Card {
-  titulo = input.required<string>();
-  descricao = input('');
+  readonly titulo = input.required<string>();
+  readonly descricao = input('');
 }

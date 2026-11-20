@@ -3,22 +3,11 @@ import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-topbar',
+  standalone: true,
   imports: [RouterLink],
-  template: `
-    <header class="fs-topbar">
-      <span>Escrituração contábil</span>
-
-      <div class="fs-topbar-acoes">
-        <a class="fs-botao" routerLink="/empresas">
-          {{ empresa() }} <span aria-hidden="true">▾</span>
-        </a>
-        <button class="fs-botao fs-primario" type="button" disabled>
-          + Novo lançamento
-        </button>
-      </div>
-    </header>
-  `,
+  templateUrl: './topbar.html',
+  styleUrl: './topbar.css',
 })
 export class Topbar {
-  empresa = input('Selecionar empresa');
+  readonly empresa = input('Selecionar empresa');
 }

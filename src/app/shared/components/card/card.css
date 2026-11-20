@@ -1,0 +1,24 @@
+:host {
+  display: block;
+  min-width: 0;
+  margin-bottom: 16px;
+}
+
+.fs-card {
+  padding: 20px;
+  border: 1px solid var(--fs-borda, #e7e0f0);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--fs-texto, #211738);
+}
+
+.fs-card h2 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.fs-card-descricao {
+  margin: 6px 0 16px;
+  color: var(--fs-suave, #655979);
+  font-size: 13px;
+}
