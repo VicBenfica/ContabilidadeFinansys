@@ -82,6 +82,18 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/livro-diario/livro-diario').then((m) => m.LivroDiario),
       },
+      {
+        path: 'relatorios',
+        redirectTo: 'relatorios/balancete',
+        pathMatch: 'full',
+      },
+      {
+        path: 'relatorios/balancete',
+        loadComponent: () =>
+          import('./pages/balancete-verificacao/balancete-verificacao').then(
+            (m) => m.BalanceteVerificacao,
+          ),
+      },
     ],
   },
 ];
