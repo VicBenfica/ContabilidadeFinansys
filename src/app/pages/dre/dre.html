@@ -1,0 +1,126 @@
+<header class="dre-cabecalho">
+  <div>
+    <small>FINANSYS / ESCRITURAÇÃO</small>
+    <h1>DRE</h1>
+    <p>Demonstração do Resultado do Exercício por competência.</p>
+  </div>
+
+  <div class="dre-acoes">
+    <button class="fs-botao dre-btn" type="button" (click)="gerarPdf()">
+      Gerar PDF
+    </button>
+
+    <button
+      class="fs-botao dre-btn"
+      type="button"
+      [disabled]="gerandoExcel"
+      (click)="exportarExcel()"
+    >
+      {{ gerandoExcel ? 'Exportando…' : 'Exportar Excel' }}
+    </button>
+  </div>
+</header>
+
+<nav class="dre-abas" aria-label="Relatórios contábeis">
+  <a
+    class="dre-aba"
+    routerLink="/relatorios/balancete"
+    routerLinkActive="dre-aba-ativa"
+  >
+    Balancete
+  </a>
+  <a
+    class="dre-aba"
+    routerLink="/relatorios/balanco-patrimonial"
+    routerLinkActive="dre-aba-ativa"
+  >
+    Balanço Patrimonial
+  </a>
+  <a
+    class="dre-aba"
+    routerLink="/relatorios/dre"
+    routerLinkActive="dre-aba-ativa"
+  >
+    DRE
+  </a>
+  <a
+    class="dre-aba"
+    routerLink="/relatorios/dfc"
+    routerLinkActive="dre-aba-ativa"
+  >
+    DFC
+  </a>
+</nav>
+
+<section class="dre-filtros-card" aria-label="Filtros da DRE">
+  <form class="dre-filtros" (ngSubmit)="aplicarFiltros()">
+    <label>
+      Data inicial
+      <input type="date" name="dataInicial" [(ngModel)]="filtros.dataInicial" />
+    </label>
+
+    <label>
+      Data final
+      <input type="date" name="dataFinal" [(ngModel)]="filtros.dataFinal" />
+    </label>
+
+    <button class="fs-botao dre-filtrar" type="submit">Aplicar filtros</button>
+  </form>
+</section>
+
+@if (erroExportacao) {
+  <p class="dre-erro" role="alert">{{ erroExportacao }}</p>
+}
+
+<section class="dre-resumo-cards" aria-label="Indicadores de resultado">
+  <article class="dre-kpi-card">
+    <span class="dre-kpi-label">Receita de vendas</span>
+    <strong class="dre-kpi-valor">
+      {{ receitaVendas() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+    </strong>
+  </article>
+
+  <article class="dre-kpi-card">
+    <span class="dre-kpi-label">Resultado bruto</span>
+    <strong class="dre-kpi-valor">
+      {{ resultadoBruto() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+    </strong>
+  </article>
+
+  <article class="dre-kpi-card dre-kpi-destaque">
+    <span class="dre-kpi-label">Lucro do período</span>
+    <strong class="dre-kpi-valor">
+      {{ lucroPeriodo() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+    </strong>
+  </article>
+</section>
+
+<app-card titulo="Composição do resultado">
+  <div class="fs-table-wrap">
+    <table class="fs-table dre-tabela" aria-label="Tabela de composição do resultado">
+      <thead>
+        <tr>
+          <th scope="col">Conta / grupo</th>
+          <th scope="col">Descrição</th>
+          <th scope="col">Total</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (item of composicaoResultado(); track item.contaGrupo) {
+          <tr>
+            <td class="dre-conta">{{ item.contaGrupo }}</td>
+            <td>{{ item.descricao }}</td>
+            <td class="dre-total">
+              @if (item.redutora) {
+                ({{ item.total | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }})
+              } @else {
+                {{ item.total | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</app-card>
