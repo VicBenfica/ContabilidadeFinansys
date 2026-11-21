@@ -9,9 +9,11 @@ import {
   ExportacaoService,
   type DocumentoExportacao,
 } from '../../shared/services/exportacao.service';
+import { PlanoContasService } from '../../shared/services/plano-contas.service';
 
 @Component({
   selector: 'app-exportacoes',
+  standalone: true,
   imports: [Card, FormsModule, RouterLink],
   templateUrl: './exportacoes.html',
   styleUrl: './exportacoes.css',
@@ -19,15 +21,18 @@ import {
 export class Exportacoes {
   private readonly rota = inject(ActivatedRoute);
   private readonly exportacao = inject(ExportacaoService);
+  private readonly planoService = inject(PlanoContasService);
 
   readonly empresa = inject(EmpresasService).selecionada;
 
   private readonly parametros = toSignal(this.rota.queryParamMap, {
     initialValue: this.rota.snapshot.queryParamMap,
   });
+
   formato: 'pdf' | 'xlsx' =
     this.parametros().get('formato') === 'xlsx' ? 'xlsx' : 'pdf';
 
+  mes = '2026-11';
   gerando = false;
   erroExportacao = '';
 
@@ -35,6 +40,35 @@ export class Exportacoes {
     style: 'currency',
     currency: 'BRL',
   });
+
+  get consolidado(): boolean {
+    return this.parametros().get('tipo') !== 'diario';
+  }
+
+  get documento(): DocumentoExportacao | null {
+    const empresa = this.empresa();
+    if (!empresa || !this.mes) return null;
+
+    if (!this.consolidado) {
+      return this.exportacao.gerarDiario(empresa.id, this.mes);
+    }
+
+    const diario = this.exportacao.gerarDiario(empresa.id, this.mes);
+    if (diario.linhas.length > 0) {
+      return {
+        ...diario,
+        titulo: 'Relatório Contábil Consolidado (Diário, Razão, Balancete, Balanço, DRE e DFC)',
+      };
+    }
+
+    return {
+      titulo: 'Relatório Contábil Consolidado (Diário, Razão, Balancete, Balanço, DRE e DFC)',
+      colunas: ['Código', 'Conta contábil', 'Grupo', 'Subgrupo', 'Tipo'],
+      linhas: this.planoService
+        .contas()
+        .map((c) => [c.codigo, c.nome, c.grupo, c.subgrupo, c.tipo]),
+    };
+  }
 
   formatarCelula(valor: string | number): string {
     return typeof valor === 'number' ? this.moeda.format(valor) : valor;
@@ -48,7 +82,7 @@ export class Exportacoes {
 
     this.erroExportacao = '';
 
-    if (this.formato === 'pdf') {
+    if (this.consolidado || this.formato === 'pdf') {
       window.print();
       return;
     }
@@ -62,19 +96,6 @@ export class Exportacoes {
     } finally {
       this.gerando = false;
     }
-  }
-  mes = '2026-11';
-
-  get consolidado(): boolean {
-    return this.parametros().get('tipo') !== 'diario';
-  }
-
-  get documento(): DocumentoExportacao | null {
-    const empresa = this.empresa();
-
-    if (!empresa || !this.mes || this.consolidado) return null;
-
-    return this.exportacao.gerarDiario(empresa.id, this.mes);
   }
 
   imprimir(): void {
