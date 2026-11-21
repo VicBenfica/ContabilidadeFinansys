@@ -1,0 +1,213 @@
+.bi-cabecalho {
+  margin-bottom: 22px;
+}
+
+.bi-cabecalho small {
+  color: var(--fs-roxo);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+}
+
+.bi-cabecalho h1 {
+  margin: 4px 0;
+  font-size: 30px;
+  line-height: 1.2;
+}
+
+.bi-cabecalho p {
+  margin: 6px 0 0;
+  color: var(--fs-suave);
+  font-size: 13px;
+}
+
+.bi-dados-grid {
+  display: grid;
+  grid-template-columns: 220px minmax(260px, 520px);
+  gap: 14px;
+}
+
+.bi-dados-grid label {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fs-texto);
+}
+
+.bi-dados-grid input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 38px;
+  padding: 8px 12px;
+  border: 1px solid var(--fs-borda, #e7e0f0);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--fs-texto);
+  font: inherit;
+  font-size: 13px;
+}
+
+.bi-dados-grid input:focus {
+  outline: none;
+  border-color: var(--fs-roxo);
+  box-shadow: 0 0 0 3px rgba(96, 65, 176, 0.12);
+}
+
+.bi-secao {
+  margin-top: 18px;
+}
+
+.bi-tabela {
+  margin-top: 4px;
+}
+
+.bi-tabela tbody tr:nth-child(even) {
+  background: #f9f6fe;
+}
+
+.bi-codigo {
+  color: var(--fs-roxo);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.bi-select-conta {
+  width: 100%;
+  max-width: 280px;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--fs-texto);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.bi-select-conta:hover,
+.bi-select-conta:focus {
+  outline: none;
+  border-color: var(--fs-borda, #e7e0f0);
+  background: #fff;
+}
+
+.bi-valor-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--fs-texto);
+  font-size: 13px;
+}
+
+.bi-valor-wrap span {
+  color: var(--fs-suave);
+  font-size: 12px;
+}
+
+.bi-valor-wrap input {
+  width: 110px;
+  padding: 5px 8px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--fs-texto);
+  font: inherit;
+  font-size: 13px;
+}
+
+.bi-valor-wrap input:hover,
+.bi-valor-wrap input:focus {
+  outline: none;
+  border-color: var(--fs-borda, #e7e0f0);
+  background: #fff;
+}
+
+.bi-remover {
+  border: 0;
+  background: transparent;
+  color: var(--fs-texto);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+
+.bi-remover:hover {
+  color: #b42318;
+  background: #fef3f2;
+}
+
+.bi-vazio {
+  padding: 16px 0;
+  color: var(--fs-suave);
+  font-size: 13px;
+  text-align: center;
+}
+
+.bi-adicionar-wrap {
+  margin-top: 16px;
+}
+
+.bi-btn-adicionar {
+  padding: 9px 16px;
+  cursor: pointer;
+}
+
+.bi-btn-adicionar:hover {
+  background: #f8f5ff;
+  border-color: #d5c8eb;
+}
+
+.bi-resumo-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 13px 18px;
+  border-radius: 10px;
+  background: #e3f5ea;
+  color: #15693b;
+  font-size: 12px;
+}
+
+.bi-resumo-bar.bi-resumo-desequilibrado {
+  background: #fef3f2;
+  color: #b42318;
+}
+
+.bi-separador {
+  opacity: 0.65;
+}
+
+.bi-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.bi-btn {
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.bi-btn:not(.fs-primario):hover {
+  background: #f8f5ff;
+  border-color: #d5c8eb;
+}
+
+.bi-btn.fs-primario:hover:not(:disabled) {
+  background: #52359b;
+}
+
+@media (max-width: 720px) {
+  .bi-dados-grid {
+    grid-template-columns: 1fr;
+  }
+}
