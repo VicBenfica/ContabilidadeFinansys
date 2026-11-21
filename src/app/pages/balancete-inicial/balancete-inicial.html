@@ -1,0 +1,161 @@
+<header class="bi-cabecalho">
+  <div>
+    <small>FINANSYS / ESCRITURAÇÃO</small>
+    <h1>Balancete inicial</h1>
+    <p>Registre os saldos de abertura antes da primeira movimentação, se houver.</p>
+  </div>
+</header>
+
+<app-card
+  titulo="Dados da abertura"
+  descricao="A abertura usa contas patrimoniais e precisa estar equilibrada."
+>
+  <div class="bi-dados-grid">
+    <label>
+      Data da abertura
+      <input
+        type="date"
+        name="dataAbertura"
+        [(ngModel)]="dataAbertura"
+        required
+      />
+    </label>
+
+    <label>
+      Histórico
+      <input
+        type="text"
+        name="historico"
+        [(ngModel)]="historico"
+        placeholder="Saldos de abertura"
+        required
+      />
+    </label>
+  </div>
+</app-card>
+
+<section class="bi-secao">
+  <app-card titulo="Saldos por conta">
+    <div class="fs-table-wrap">
+      <table class="fs-table bi-tabela" aria-label="Saldos de abertura por conta patrimonial">
+        <thead>
+          <tr>
+            <th scope="col">Código</th>
+            <th scope="col">Conta patrimonial</th>
+            <th scope="col">Débito</th>
+            <th scope="col">Crédito</th>
+            <th scope="col">Ação</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (linha of linhas(); track linha.id) {
+            <tr>
+              <td class="bi-codigo">{{ linha.codigo }}</td>
+
+              <td>
+                <select
+                  class="bi-select-conta"
+                  [ngModel]="linha.codigo"
+                  (ngModelChange)="aoTrocarConta(linha.id, $event)"
+                  [attr.aria-label]="'Conta patrimonial da linha ' + linha.id"
+                >
+                  @for (conta of contasPatrimoniais(); track conta.codigo) {
+                    <option [value]="conta.codigo">{{ conta.nome }}</option>
+                  }
+                </select>
+              </td>
+
+              <td>
+                <div class="bi-valor-wrap">
+                  <span>R$</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="—"
+                    [ngModel]="linha.debito"
+                    (ngModelChange)="aoAlterarDebito(linha.id, $event)"
+                    [attr.aria-label]="'Débito de ' + linha.nome"
+                  />
+                </div>
+              </td>
+
+              <td>
+                <div class="bi-valor-wrap">
+                  <span>R$</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="—"
+                    [ngModel]="linha.credito"
+                    (ngModelChange)="aoAlterarCredito(linha.id, $event)"
+                    [attr.aria-label]="'Crédito de ' + linha.nome"
+                  />
+                </div>
+              </td>
+
+              <td>
+                <button
+                  class="bi-remover"
+                  type="button"
+                  (click)="removerLinha(linha.id)"
+                >
+                  Remover
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="bi-vazio">
+                Nenhuma conta adicionada ao balancete inicial.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="bi-adicionar-wrap">
+      <button class="fs-botao bi-btn-adicionar" type="button" (click)="adicionarConta()">
+        + Adicionar conta
+      </button>
+    </div>
+  </app-card>
+</section>
+
+<div
+  class="bi-resumo-bar"
+  [class.bi-resumo-desequilibrado]="!equilibrado()"
+  role="status"
+  aria-live="polite"
+>
+  <span>
+    <strong>Débitos:</strong>
+    {{ totalDebitos() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+  </span>
+  <span class="bi-separador">·</span>
+  <span>
+    <strong>Créditos:</strong>
+    {{ totalCreditos() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+  </span>
+  <span class="bi-separador">·</span>
+  <span>
+    <strong>Diferença:</strong>
+    {{ diferenca() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+  </span>
+</div>
+
+<div class="bi-acoes">
+  <a class="fs-botao bi-btn" routerLink="/plano-contas">Cancelar</a>
+
+  <button
+    class="fs-botao fs-primario bi-btn"
+    type="button"
+    [disabled]="!equilibrado() || !dataAbertura || !historico.trim()"
+    (click)="contabilizarAbertura()"
+  >
+    Contabilizar abertura
+  </button>
+</div>

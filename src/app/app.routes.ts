@@ -35,6 +35,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'plano-contas/balancete-inicial',
+        loadComponent: () =>
+          import('./pages/balancete-inicial/balancete-inicial').then(
+            (m) => m.BalanceteInicial,
+          ),
+      },
+      {
         path: 'plano-contas',
         loadComponent: () =>
           import('./pages/plano-contas/plano-contas').then(
