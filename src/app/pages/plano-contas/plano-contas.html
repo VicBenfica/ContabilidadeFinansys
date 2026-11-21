@@ -25,9 +25,9 @@
       Carregar plano padrão
     </button>
 
-    <button class="fs-botao" type="button" (click)="abrirModalNovaConta()">
+    <a class="fs-botao" routerLink="/plano-contas/nova">
       + Nova conta
-    </button>
+    </a>
   </div>
 </app-card>
 
@@ -103,13 +103,12 @@
               </td>
               <td>{{ conta.tipo }}</td>
               <td>
-                <button
+                <a
                   class="pc-editar"
-                  type="button"
-                  (click)="abrirModalEditarConta(conta)"
+                  [routerLink]="['/plano-contas', 'editar', conta.codigo]"
                 >
                   Editar
-                </button>
+                </a>
               </td>
             </tr>
           }
@@ -120,85 +119,3 @@
     <p class="pc-vazio">Nenhuma conta encontrada para os filtros selecionados.</p>
   }
 </app-card>
-
-@if (exibirModalConta) {
-  <div class="pc-modal-backdrop" (click)="fecharModalConta()">
-    <div
-      class="pc-modal"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="pc-modal-titulo"
-      (click)="$event.stopPropagation()"
-    >
-      <h2 id="pc-modal-titulo">
-        {{ codigoEmEdicao ? 'Editar conta contábil' : 'Nova conta contábil' }}
-      </h2>
-      <p>Informe o código hierárquico, o nome, o grupo, o subgrupo e o tipo da conta.</p>
-
-      <form class="pc-modal-form" (ngSubmit)="salvarConta()">
-        <label>
-          Código hierárquico
-          <input
-            type="text"
-            name="codigo"
-            [(ngModel)]="formConta.codigo"
-            placeholder="Ex. 1.0.6"
-            required
-          />
-        </label>
-
-        <label>
-          Nome da conta
-          <input
-            type="text"
-            name="nome"
-            [(ngModel)]="formConta.nome"
-            placeholder="Ex. Aplicações Financeiras"
-            required
-          />
-        </label>
-
-        <div class="pc-modal-grid">
-          <label>
-            Grupo
-            <select name="grupoConta" [(ngModel)]="formConta.grupo">
-              @for (grupo of grupos; track grupo) {
-                <option [value]="grupo">{{ grupo }}</option>
-              }
-            </select>
-          </label>
-
-          <label>
-            Subgrupo
-            <select name="subgrupoConta" [(ngModel)]="formConta.subgrupo">
-              @for (subgrupo of subgrupos; track subgrupo) {
-                <option [value]="subgrupo">{{ subgrupo }}</option>
-              }
-            </select>
-          </label>
-        </div>
-
-        <label>
-          Tipo
-          <select name="tipoConta" [(ngModel)]="formConta.tipo">
-            <option value="Analítica">Analítica</option>
-            <option value="Sintética">Sintética</option>
-          </select>
-        </label>
-
-        <div class="pc-modal-acoes">
-          <button class="fs-botao" type="button" (click)="fecharModalConta()">
-            Cancelar
-          </button>
-          <button
-            class="fs-botao fs-primario"
-            type="submit"
-            [disabled]="!formConta.codigo.trim() || !formConta.nome.trim()"
-          >
-            {{ codigoEmEdicao ? 'Salvar alterações' : 'Salvar conta' }}
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-}
