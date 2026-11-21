@@ -18,6 +18,16 @@ export const routes: Routes = [
       { path: 'home', component: Home },
       { path: 'empresas', component: Empresas },
       {
+        path: 'plano-contas/nova',
+        loadComponent: () =>
+          import('./pages/nova-conta/nova-conta').then((m) => m.NovaConta),
+      },
+      {
+        path: 'plano-contas/editar/:codigo',
+        loadComponent: () =>
+          import('./pages/nova-conta/nova-conta').then((m) => m.NovaConta),
+      },
+      {
         path: 'plano-contas/importar',
         loadComponent: () =>
           import('./pages/importar-plano/importar-plano').then(

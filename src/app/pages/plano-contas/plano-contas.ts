@@ -6,8 +6,6 @@ import {
   ContaContabil,
   GrupoContabil,
   PlanoContasService,
-  SubgrupoContabil,
-  TipoConta,
 } from '../../shared/services/plano-contas.service';
 
 @Component({
@@ -29,16 +27,6 @@ export class PlanoContas {
     'Apuração do Resultado',
   ];
 
-  readonly subgrupos: SubgrupoContabil[] = [
-    'Circulante',
-    'Realizável a Longo Prazo',
-    'Investimento',
-    'Imobilizado',
-    'Intangível',
-    'Não Circulante',
-    'N/A',
-  ];
-
   filtros = {
     busca: '',
     grupo: '',
@@ -46,17 +34,6 @@ export class PlanoContas {
   };
 
   filtrosAplicados = { ...this.filtros };
-
-  exibirModalConta = false;
-  codigoEmEdicao: string | null = null;
-
-  formConta = {
-    codigo: '',
-    nome: '',
-    grupo: 'Ativo' as GrupoContabil,
-    subgrupo: 'Circulante' as SubgrupoContabil,
-    tipo: 'Analítica' as TipoConta,
-  };
 
   get contasFiltradas(): ContaContabil[] {
     const termo = this.filtrosAplicados.busca.trim().toLowerCase();
@@ -83,54 +60,6 @@ export class PlanoContas {
     this.planoService.restaurarPadrao();
     this.filtros = { busca: '', grupo: '', tipo: '' };
     this.aplicarFiltros();
-  }
-
-  abrirModalNovaConta(): void {
-    this.codigoEmEdicao = null;
-    this.formConta = {
-      codigo: '',
-      nome: '',
-      grupo: 'Ativo',
-      subgrupo: 'Circulante',
-      tipo: 'Analítica',
-    };
-    this.exibirModalConta = true;
-  }
-
-  abrirModalEditarConta(conta: ContaContabil): void {
-    this.codigoEmEdicao = conta.codigo;
-    this.formConta = {
-      codigo: conta.codigo,
-      nome: conta.nome,
-      grupo: conta.grupo,
-      subgrupo: conta.subgrupo,
-      tipo: conta.tipo,
-    };
-    this.exibirModalConta = true;
-  }
-
-  fecharModalConta(): void {
-    this.exibirModalConta = false;
-    this.codigoEmEdicao = null;
-  }
-
-  salvarConta(): void {
-    const codigo = this.formConta.codigo.trim();
-    const nome = this.formConta.nome.trim();
-    if (!codigo || !nome) return;
-
-    const nivel = Math.max(0, codigo.split('.').length - 1);
-    const registro: ContaContabil = {
-      codigo,
-      nome,
-      grupo: this.formConta.grupo,
-      subgrupo: this.formConta.subgrupo,
-      tipo: this.formConta.tipo,
-      nivel,
-    };
-
-    this.planoService.salvarConta(registro, this.codigoEmEdicao);
-    this.fecharModalConta();
   }
 
   exportarCsv(): void {

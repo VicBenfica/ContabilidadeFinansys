@@ -1,0 +1,90 @@
+<header class="nc-cabecalho">
+  <div>
+    <small>FINANSYS / ESCRITURAÇÃO</small>
+    <h1>{{ codigoEmEdicao ? 'Editar conta contábil' : 'Nova conta contábil' }}</h1>
+    <p>Cadastre uma conta no grupo e nível corretos.</p>
+  </div>
+</header>
+
+<form (ngSubmit)="salvarConta()">
+  <app-card
+    titulo="Identificação da conta"
+    descricao="Escolha um código único de acordo com a conta superior."
+  >
+    <div class="nc-grid-superior">
+      <label>
+        Código
+        <input
+          type="text"
+          name="codigo"
+          [(ngModel)]="form.codigo"
+          placeholder="1.1.05"
+          required
+        />
+      </label>
+
+      <label>
+        Nome da conta
+        <input
+          type="text"
+          name="nome"
+          [(ngModel)]="form.nome"
+          placeholder="Aplicações financeiras"
+          required
+        />
+      </label>
+
+      <label>
+        Grupo
+        <select name="grupo" [(ngModel)]="form.grupo" (ngModelChange)="aoMudarGrupo()">
+          @for (grupo of grupos; track grupo) {
+            <option [value]="grupo">{{ grupo }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Tipo
+        <select name="tipo" [(ngModel)]="form.tipo">
+          <option value="Analítica">Analítica</option>
+          <option value="Sintética">Sintética</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="nc-grid-inferior">
+      <label>
+        Conta superior
+        <select name="contaSuperior" [(ngModel)]="form.contaSuperior">
+          @for (sup of contasSuperiores; track sup.label) {
+            <option [value]="sup.label">{{ sup.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Natureza
+        <select name="natureza" [(ngModel)]="form.natureza">
+          <option value="Devedora">Devedora</option>
+          <option value="Credora">Credora</option>
+        </select>
+      </label>
+    </div>
+
+    @if (erroCodigo) {
+      <p class="nc-erro" role="alert">{{ erroCodigo }}</p>
+    }
+  </app-card>
+
+  <div class="nc-acoes">
+    <a class="fs-botao nc-btn" routerLink="/plano-contas">Cancelar</a>
+
+    <button
+      class="fs-botao fs-primario nc-btn"
+      type="submit"
+      [disabled]="!podeSalvar"
+    >
+      Salvar conta
+    </button>
+  </div>
+</form>
