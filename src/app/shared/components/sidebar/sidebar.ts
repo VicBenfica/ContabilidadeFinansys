@@ -14,7 +14,7 @@ export class Sidebar {
     { nome: 'Plano de contas', icone: '▤', rota: '/plano-contas' },
     { nome: 'Livro Diário', icone: '≡', rota: '/livro-diario' },
     { nome: 'Livro Razão', icone: '◫', rota: '/livro-razao' },
-    { nome: 'Relatórios', icone: '▧', rota: null },
+    { nome: 'Relatórios', icone: '▧', rota: '/relatorios' },
     { nome: 'Estoque', icone: '◇', rota: null },
   ];
 }
