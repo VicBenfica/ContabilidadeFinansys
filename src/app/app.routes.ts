@@ -94,6 +94,13 @@ export const routes: Routes = [
             (m) => m.BalanceteVerificacao,
           ),
       },
+      {
+        path: 'relatorios/balanco-patrimonial',
+        loadComponent: () =>
+          import('./pages/balanco-patrimonial/balanco-patrimonial').then(
+            (m) => m.BalancoPatrimonial,
+          ),
+      },
     ],
   },
 ];

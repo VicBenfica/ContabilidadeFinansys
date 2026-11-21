@@ -1,0 +1,122 @@
+<header class="bp-cabecalho">
+  <div>
+    <small>FINANSYS / ESCRITURAÇÃO</small>
+    <h1>Balanço Patrimonial</h1>
+    <p>Posição acumulada da empresa na data de referência.</p>
+  </div>
+
+  <div class="bp-acoes">
+    <button class="fs-botao bp-btn" type="button" (click)="gerarPdf()">
+      Gerar PDF
+    </button>
+
+    <button
+      class="fs-botao bp-btn"
+      type="button"
+      [disabled]="gerandoExcel"
+      (click)="exportarExcel()"
+    >
+      {{ gerandoExcel ? 'Exportando…' : 'Exportar Excel' }}
+    </button>
+  </div>
+</header>
+
+<nav class="bp-abas" aria-label="Relatórios contábeis">
+  <a
+    class="bp-aba"
+    routerLink="/relatorios/balancete"
+    routerLinkActive="bp-aba-ativa"
+  >
+    Balancete
+  </a>
+  <a
+    class="bp-aba"
+    routerLink="/relatorios/balanco-patrimonial"
+    routerLinkActive="bp-aba-ativa"
+  >
+    Balanço Patrimonial
+  </a>
+  <a
+    class="bp-aba"
+    routerLink="/relatorios/dre"
+    routerLinkActive="bp-aba-ativa"
+  >
+    DRE
+  </a>
+  <a
+    class="bp-aba"
+    routerLink="/relatorios/dfc"
+    routerLinkActive="bp-aba-ativa"
+  >
+    DFC
+  </a>
+</nav>
+
+<section class="bp-filtros-card" aria-label="Filtro de data de referência">
+  <form class="bp-filtros" (ngSubmit)="aplicarFiltros()">
+    <label>
+      Data de referência
+      <input
+        type="date"
+        name="dataReferencia"
+        [(ngModel)]="dataReferencia"
+        required
+      />
+    </label>
+
+    <button class="fs-botao bp-filtrar" type="submit">Aplicar filtros</button>
+  </form>
+</section>
+
+@if (erroExportacao) {
+  <p class="bp-erro" role="alert">{{ erroExportacao }}</p>
+}
+
+<section class="bp-resumo-cards" aria-label="Indicadores patrimoniais">
+  <article class="bp-kpi-card">
+    <span class="bp-kpi-label">Ativo total</span>
+    <strong class="bp-kpi-valor">
+      {{ ativoTotal() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+    </strong>
+  </article>
+
+  <article class="bp-kpi-card">
+    <span class="bp-kpi-label">Passivo total</span>
+    <strong class="bp-kpi-valor">
+      {{ passivoTotal() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+    </strong>
+  </article>
+
+  <article class="bp-kpi-card bp-kpi-destaque">
+    <span class="bp-kpi-label">Patrimônio líquido</span>
+    <strong class="bp-kpi-valor">
+      {{ patrimonioLiquido() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+    </strong>
+  </article>
+</section>
+
+<app-card titulo="Grupos patrimoniais">
+  <div class="fs-table-wrap">
+    <table class="fs-table bp-tabela" aria-label="Tabela de grupos patrimoniais">
+      <thead>
+        <tr>
+          <th scope="col">Grupo</th>
+          <th scope="col">Composição</th>
+          <th scope="col">Total</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (item of gruposPatrimoniais(); track item.grupo) {
+          <tr>
+            <td class="bp-grupo">{{ item.grupo }}</td>
+            <td>{{ item.composicao }}</td>
+            <td class="bp-total">
+              {{ item.total | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</app-card>
