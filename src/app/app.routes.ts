@@ -101,6 +101,11 @@ export const routes: Routes = [
             (m) => m.BalancoPatrimonial,
           ),
       },
+      {
+        path: 'relatorios/dre',
+        loadComponent: () =>
+          import('./pages/dre/dre').then((m) => m.Dre),
+      },
     ],
   },
 ];
