@@ -1,0 +1,130 @@
+<header class="dfc-cabecalho">
+  <div>
+    <small>FINANSYS / ESCRITURAÇÃO</small>
+    <h1>DFC</h1>
+    <p>Demonstração dos Fluxos de Caixa pelo método direto.</p>
+  </div>
+
+  <div class="dfc-acoes">
+    <button class="fs-botao dfc-btn" type="button" (click)="gerarPdf()">
+      Gerar PDF
+    </button>
+
+    <button
+      class="fs-botao dfc-btn"
+      type="button"
+      [disabled]="gerandoExcel"
+      (click)="exportarExcel()"
+    >
+      {{ gerandoExcel ? 'Exportando…' : 'Exportar Excel' }}
+    </button>
+  </div>
+</header>
+
+<nav class="dfc-abas" aria-label="Relatórios contábeis">
+  <a
+    class="dfc-aba"
+    routerLink="/relatorios/balancete"
+    routerLinkActive="dfc-aba-ativa"
+  >
+    Balancete
+  </a>
+  <a
+    class="dfc-aba"
+    routerLink="/relatorios/balanco-patrimonial"
+    routerLinkActive="dfc-aba-ativa"
+  >
+    Balanço Patrimonial
+  </a>
+  <a
+    class="dfc-aba"
+    routerLink="/relatorios/dre"
+    routerLinkActive="dfc-aba-ativa"
+  >
+    DRE
+  </a>
+  <a
+    class="dfc-aba"
+    routerLink="/relatorios/dfc"
+    routerLinkActive="dfc-aba-ativa"
+  >
+    DFC
+  </a>
+</nav>
+
+<section class="dfc-filtros-card" aria-label="Filtros da DFC">
+  <form class="dfc-filtros" (ngSubmit)="aplicarFiltros()">
+    <label>
+      Data inicial
+      <input type="date" name="dataInicial" [(ngModel)]="filtros.dataInicial" />
+    </label>
+
+    <label>
+      Data final
+      <input type="date" name="dataFinal" [(ngModel)]="filtros.dataFinal" />
+    </label>
+
+    <button class="fs-botao dfc-filtrar" type="submit">Aplicar filtros</button>
+  </form>
+</section>
+
+@if (erroExportacao) {
+  <p class="dfc-erro" role="alert">{{ erroExportacao }}</p>
+}
+
+<section class="dfc-resumo-cards" aria-label="Indicadores de caixa">
+  <article class="dfc-kpi-card">
+    <span class="dfc-kpi-label">Caixa no início</span>
+    <strong class="dfc-kpi-valor">
+      {{ caixaInicio() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+    </strong>
+  </article>
+
+  <article class="dfc-kpi-card">
+    <span class="dfc-kpi-label">Variação líquida</span>
+    <strong class="dfc-kpi-valor">
+      @if (variacaoLiquida() < 0) {
+        ({{ -variacaoLiquida() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }})
+      } @else {
+        {{ variacaoLiquida() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+      }
+    </strong>
+  </article>
+
+  <article class="dfc-kpi-card dfc-kpi-destaque">
+    <span class="dfc-kpi-label">Caixa no fim</span>
+    <strong class="dfc-kpi-valor">
+      {{ caixaFim() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+    </strong>
+  </article>
+</section>
+
+<app-card titulo="Movimentos de caixa no período">
+  <div class="fs-table-wrap">
+    <table class="fs-table dfc-tabela" aria-label="Tabela de movimentos de caixa">
+      <thead>
+        <tr>
+          <th scope="col">Grupo</th>
+          <th scope="col">Movimento</th>
+          <th scope="col">Valor</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (item of movimentos(); track item.id) {
+          <tr>
+            <td class="dfc-grupo">{{ item.grupo }}</td>
+            <td>{{ item.movimento }}</td>
+            <td class="dfc-valor">
+              @if (item.valor < 0) {
+                ({{ -item.valor | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }})
+              } @else {
+                {{ item.valor | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</app-card>

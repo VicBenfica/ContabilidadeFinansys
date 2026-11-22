@@ -106,6 +106,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/dre/dre').then((m) => m.Dre),
       },
+      {
+        path: 'relatorios/dfc',
+        loadComponent: () =>
+          import('./pages/dfc/dfc').then((m) => m.Dfc),
+      },
     ],
   },
 ];
