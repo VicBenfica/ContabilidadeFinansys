@@ -126,6 +126,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'estoque/movimentacoes',
+        loadComponent: () =>
+          import('./pages/movimentacoes-estoque/movimentacoes-estoque').then(
+            (m) => m.MovimentacoesEstoque,
+          ),
+      },
+      {
         path: 'estoque',
         loadComponent: () =>
           import('./pages/estoque/estoque').then((m) => m.Estoque),

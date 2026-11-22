@@ -46,13 +46,9 @@
       + Novo produto
     </a>
 
-    <button
-      class="fs-botao est-btn-secundario"
-      type="button"
-      (click)="rolarParaMovimentacoes(secaoMovimentacoes)"
-    >
+    <a class="fs-botao est-btn-secundario" routerLink="/estoque/movimentacoes">
       Ver movimentações
-    </button>
+    </a>
   </div>
 
   @if (produtos().length > 0) {
@@ -89,7 +85,6 @@
 </section>
 
 <section
-  #secaoMovimentacoes
   class="est-secao-card"
   aria-labelledby="est-titulo-movimentacoes"
 >
