@@ -111,6 +111,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/dfc/dfc').then((m) => m.Dfc),
       },
+      {
+        path: 'estoque',
+        loadComponent: () =>
+          import('./pages/estoque/estoque').then((m) => m.Estoque),
+      },
     ],
   },
 ];
