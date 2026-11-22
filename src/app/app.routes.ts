@@ -119,6 +119,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'estoque/venda',
+        loadComponent: () =>
+          import('./pages/registrar-venda/registrar-venda').then(
+            (m) => m.RegistrarVenda,
+          ),
+      },
+      {
         path: 'estoque',
         loadComponent: () =>
           import('./pages/estoque/estoque').then((m) => m.Estoque),
