@@ -15,6 +15,6 @@ export class Sidebar {
     { nome: 'Livro Diário', icone: '≡', rota: '/livro-diario' },
     { nome: 'Livro Razão', icone: '◫', rota: '/livro-razao' },
     { nome: 'Relatórios', icone: '▧', rota: '/relatorios' },
-    { nome: 'Estoque', icone: '◇', rota: null },
+    { nome: 'Estoque', icone: '◇', rota: '/estoque' },
   ];
 }
