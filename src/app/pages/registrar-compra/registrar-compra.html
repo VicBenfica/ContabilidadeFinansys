@@ -1,0 +1,169 @@
+<header class="rc-cabecalho">
+  <small>FINANSYS / ESCRITURAÇÃO</small>
+  <h1>Registrar compra</h1>
+  <p>Contabilize a compra e a entrada do produto no estoque em um só lançamento.</p>
+</header>
+
+<form class="rc-formulario" (ngSubmit)="contabilizarCompra()">
+  <section class="rc-card" aria-labelledby="rc-etapa-1">
+    <h2 id="rc-etapa-1">1. Dados da operação</h2>
+    <p class="rc-subtitulo">O custo total da compra alimenta o custo médio do estoque.</p>
+
+    <div class="rc-grid-dados">
+      <label>
+        Data
+        <input
+          type="date"
+          name="data"
+          [ngModel]="data()"
+          (ngModelChange)="data.set($event)"
+          required
+        />
+      </label>
+
+      <label>
+        Produto
+        <select
+          name="produtoId"
+          [ngModel]="produtoId()"
+          (ngModelChange)="produtoId.set($event)"
+          required
+        >
+          @for (prod of produtos(); track prod.id) {
+            <option [value]="prod.id">{{ prod.nome }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Quantidade
+        <input
+          type="number"
+          name="quantidade"
+          min="1"
+          step="1"
+          [ngModel]="quantidade()"
+          (ngModelChange)="quantidade.set(+$event)"
+          required
+        />
+      </label>
+
+      <label>
+        Histórico
+        <input
+          type="text"
+          name="historico"
+          [ngModel]="historico()"
+          (ngModelChange)="historico.set($event)"
+          placeholder="Ex.: Compra de 10 cadernos"
+          required
+        />
+      </label>
+    </div>
+  </section>
+
+  <section class="rc-card" aria-labelledby="rc-etapa-2">
+    <h2 id="rc-etapa-2">2. Distribuição do valor</h2>
+    <p class="rc-subtitulo">
+      Separe a parte à vista e a vencer no curto e no longo prazo conforme os vencimentos.
+    </p>
+
+    <div class="rc-grid-valores">
+      <label>
+        Valor total
+        <div class="rc-moeda-campo">
+          <span>R$</span>
+          <input
+            type="number"
+            name="valorTotal"
+            min="0"
+            step="0.01"
+            [ngModel]="valorTotal()"
+            (ngModelChange)="aoAlterarValorTotal($event)"
+            required
+          />
+        </div>
+      </label>
+
+      <label>
+        À vista
+        <div class="rc-moeda-campo">
+          <span>R$</span>
+          <input
+            type="number"
+            name="valorAVista"
+            min="0"
+            step="0.01"
+            [ngModel]="valorAVista()"
+            (ngModelChange)="valorAVista.set(+$event || 0)"
+          />
+        </div>
+      </label>
+
+      <label>
+        Curto prazo
+        <div class="rc-moeda-campo">
+          <span>R$</span>
+          <input
+            type="number"
+            name="valorCurtoPrazo"
+            min="0"
+            step="0.01"
+            [ngModel]="valorCurtoPrazo()"
+            (ngModelChange)="valorCurtoPrazo.set(+$event || 0)"
+          />
+        </div>
+      </label>
+
+      <label>
+        Longo prazo
+        <div class="rc-moeda-campo">
+          <span>R$</span>
+          <input
+            type="number"
+            name="valorLongoPrazo"
+            min="0"
+            step="0.01"
+            [ngModel]="valorLongoPrazo()"
+            (ngModelChange)="valorLongoPrazo.set(+$event || 0)"
+          />
+        </div>
+      </label>
+    </div>
+  </section>
+
+  <section class="rc-card" aria-labelledby="rc-etapa-3">
+    <h2 id="rc-etapa-3">3. Prévia da contabilização</h2>
+    <p class="rc-subtitulo">
+      Débito: Estoque. Crédito: Caixa. Em compras a prazo, use Fornecedores de curto ou longo prazo.
+    </p>
+
+    <div
+      class="rc-previa-banner"
+      [class.rc-previa-alerta]="!partidasFechadas()"
+      role="status"
+    >
+      @if (partidasFechadas()) {
+        Débitos e créditos
+        {{ valorTotal() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }} cada ·
+        Entrada de {{ quantidade() }} {{ quantidade() === 1 ? 'unidade' : 'unidades' }}
+      } @else {
+        Diferença na distribuição: total
+        {{ valorTotal() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }} e distribuído
+        {{ somaDistribuicao() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+      }
+    </div>
+  </section>
+
+  @if (erroValidacao) {
+    <p class="rc-erro" role="alert">{{ erroValidacao }}</p>
+  }
+
+  <div class="rc-rodape-acoes">
+    <a class="fs-botao rc-btn-cancelar" routerLink="/estoque">Cancelar</a>
+
+    <button class="fs-botao rc-btn-confirmar" type="submit">
+      Contabilizar compra
+    </button>
+  </div>
+</form>

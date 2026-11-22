@@ -112,6 +112,13 @@ export const routes: Routes = [
           import('./pages/dfc/dfc').then((m) => m.Dfc),
       },
       {
+        path: 'estoque/compra',
+        loadComponent: () =>
+          import('./pages/registrar-compra/registrar-compra').then(
+            (m) => m.RegistrarCompra,
+          ),
+      },
+      {
         path: 'estoque',
         loadComponent: () =>
           import('./pages/estoque/estoque').then((m) => m.Estoque),
