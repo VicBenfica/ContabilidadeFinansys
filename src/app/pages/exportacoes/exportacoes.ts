@@ -1,13 +1,12 @@
-
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+
 import { Card } from '../../shared/components/card/card';
 import { EmpresasService } from '../../shared/services/empresas.service';
 import { PlanoContasService } from '../../shared/services/plano-contas.service';
 import { ArquivoProntoService } from '../../shared/services/arquivo-pronto.service';
-
 import {
   ExportacaoService,
   type DocumentoExportacao,
@@ -29,19 +28,14 @@ export class Exportacoes {
 
   readonly empresa = inject(EmpresasService).selecionada;
 
-  private readonly parametros = toSignal(
-    this.rota.queryParamMap,
-    {
-      initialValue: this.rota.snapshot.queryParamMap,
-    },
-  );
+  private readonly parametros = toSignal(this.rota.queryParamMap, {
+    initialValue: this.rota.snapshot.queryParamMap,
+  });
 
   mes = '2026-11';
 
   formato: 'pdf' | 'xlsx' =
-    this.parametros().get('formato') === 'xlsx'
-      ? 'xlsx'
-      : 'pdf';
+    this.parametros().get('formato') === 'xlsx' ? 'xlsx' : 'pdf';
 
   gerando = false;
   erroExportacao = '';
@@ -50,6 +44,7 @@ export class Exportacoes {
     style: 'currency',
     currency: 'BRL',
   });
+
   private readonly balancetePreparado = signal<{
     empresaId: number;
     periodo: string;
@@ -70,13 +65,11 @@ export class Exportacoes {
 
   obterBalancete(empresaId: number) {
     const dados = this.balancetePreparado();
-
     return dados?.empresaId === empresaId ? dados : null;
   }
 
   get tipo(): string {
     const tipoParametro = this.parametros().get('tipo');
-
     if (tipoParametro) return tipoParametro;
 
     const caminho = this.router.url.split('?')[0];
@@ -84,23 +77,21 @@ export class Exportacoes {
     if (caminho === '/relatorios/balancete/exportar') {
       return 'balancete';
     }
-
+    if (caminho === '/relatorios/balanco-patrimonial/exportar') {
+      return 'balanco-patrimonial';
+    }
     if (caminho === '/relatorios/dre/exportar') {
       return 'dre';
     }
-
     if (caminho === '/relatorios/dfc/exportar') {
       return 'dfc';
     }
-
     if (caminho === '/livro-razao/exportar') {
       return 'razao';
     }
-
     if (caminho === '/livro-diario/exportar') {
       return 'diario';
     }
-
     if (caminho === '/plano-contas/exportar') {
       return 'plano-contas';
     }
@@ -110,6 +101,10 @@ export class Exportacoes {
 
   get modoPlanoContas(): boolean {
     return this.tipo === 'plano-contas';
+  }
+
+  get modoBalancoPatrimonial(): boolean {
+    return this.tipo === 'balanco-patrimonial';
   }
 
   get modoRazao(): boolean {
@@ -130,20 +125,21 @@ export class Exportacoes {
 
   get consolidado(): boolean {
     return ![
-      'plano-contas',
       'diario',
       'razao',
+      'plano-contas',
       'balancete',
+      'balanco-patrimonial',
       'dre',
       'dfc',
     ].includes(this.tipo);
   }
 
-
   get nomeRelatorio(): string {
     if (this.modoPlanoContas) return 'Plano de Contas';
     if (this.modoRazao) return 'Livro Razão';
     if (this.modoBalancete) return 'Balancete de Verificação';
+    if (this.modoBalancoPatrimonial) return 'Balanço Patrimonial';
     if (this.modoDre) return 'DRE';
     if (this.modoDfc) return 'DFC';
     if (this.tipo === 'diario') return 'Livro Diário';
@@ -155,13 +151,13 @@ export class Exportacoes {
     if (this.modoPlanoContas) return '/plano-contas';
     if (this.modoRazao) return '/livro-razao';
     if (this.modoBalancete) return '/relatorios/balancete';
+    if (this.modoBalancoPatrimonial) return '/relatorios/balanco-patrimonial';
     if (this.modoDre) return '/relatorios/dre';
     if (this.modoDfc) return '/relatorios/dfc';
     if (this.tipo === 'diario') return '/livro-diario';
 
     return '/home';
   }
-
 
   get inicioRazao(): string {
     return this.parametros().get('inicio') ?? '';
@@ -191,46 +187,35 @@ export class Exportacoes {
     );
   }
 
-
   get balanceteExportado() {
     const empresa = this.empresa();
-
     if (!this.modoBalancete || !empresa) return null;
-
     return this.exportacao.obterBalancete(empresa.id);
   }
 
   get dreExportada() {
     const empresa = this.empresa();
-
     if (!this.modoDre || !empresa) return null;
-
     return this.exportacao.obterDre(empresa.id);
   }
 
   get dfcExportada() {
     const empresa = this.empresa();
-
     if (!this.modoDfc || !empresa) return null;
-
     return this.exportacao.obterDfc(empresa.id);
   }
 
-
   get periodoExibido(): string {
     if (this.modoBalancete) {
-      return this.balanceteExportado?.periodo
-        ?? 'Período não disponível';
+      return this.balanceteExportado?.periodo ?? 'Período não disponível';
     }
 
     if (this.modoDre) {
-      return this.dreExportada?.periodo
-        ?? 'Período não disponível';
+      return this.dreExportada?.periodo ?? 'Período não disponível';
     }
 
     if (this.modoDfc) {
-      return this.dfcExportada?.periodo
-        ?? 'Período não disponível';
+      return this.dfcExportada?.periodo ?? 'Período não disponível';
     }
 
     if (this.modoRazao) {
@@ -252,7 +237,6 @@ export class Exportacoes {
     return data.split('-').reverse().join('/');
   }
 
-
   get documento(): DocumentoExportacao | null {
     const empresa = this.empresa();
 
@@ -261,13 +245,7 @@ export class Exportacoes {
     if (this.modoPlanoContas) {
       return {
         titulo: 'Plano de Contas',
-        colunas: [
-          'Código',
-          'Conta contábil',
-          'Grupo',
-          'Subgrupo',
-          'Tipo',
-        ],
+        colunas: ['Código', 'Conta contábil', 'Grupo', 'Subgrupo', 'Tipo'],
         linhas: this.planoService.contas().map((conta) => [
           conta.codigo,
           conta.nome,
@@ -286,6 +264,28 @@ export class Exportacoes {
       return this.balanceteExportado?.documento ?? null;
     }
 
+    if (this.modoBalancoPatrimonial) {
+      return {
+        titulo: 'Balanço Patrimonial',
+        colunas: ['Código', 'Conta contábil', 'Grupo', 'Subgrupo', 'Tipo'],
+        linhas: this.planoService
+          .contas()
+          .filter(
+            (conta) =>
+              conta.grupo === 'Ativo' ||
+              conta.grupo === 'Passivo' ||
+              conta.grupo === 'Patrimônio Líquido',
+          )
+          .map((conta) => [
+            conta.codigo,
+            conta.nome,
+            conta.grupo,
+            conta.subgrupo,
+            conta.tipo,
+          ]),
+      };
+    }
+
     if (this.modoDre) {
       return this.dreExportada?.documento ?? null;
     }
@@ -297,16 +297,10 @@ export class Exportacoes {
     if (!this.mes) return null;
 
     if (this.tipo === 'diario') {
-      return this.exportacao.gerarDiario(
-        empresa.id,
-        this.mes,
-      );
+      return this.exportacao.gerarDiario(empresa.id, this.mes);
     }
 
-    const diario = this.exportacao.gerarDiario(
-      empresa.id,
-      this.mes,
-    );
+    const diario = this.exportacao.gerarDiario(empresa.id, this.mes);
 
     if (diario.linhas.length > 0) {
       return {
@@ -317,13 +311,7 @@ export class Exportacoes {
 
     return {
       titulo: 'Prévia do relatório contábil consolidado',
-      colunas: [
-        'Código',
-        'Conta contábil',
-        'Grupo',
-        'Subgrupo',
-        'Tipo',
-      ],
+      colunas: ['Código', 'Conta contábil', 'Grupo', 'Subgrupo', 'Tipo'],
       linhas: this.planoService.contas().map((conta) => [
         conta.codigo,
         conta.nome,
@@ -333,7 +321,6 @@ export class Exportacoes {
       ]),
     };
   }
-
 
   async gerarCSV(): Promise<void> {
     const relatorio = this.documento;
@@ -362,16 +349,11 @@ export class Exportacoes {
         return `"${texto.replace(/"/g, '""')}"`;
       };
 
-      const linhas = [
-        relatorio.colunas,
-        ...relatorio.linhas,
-      ];
+      const linhas = [relatorio.colunas, ...relatorio.linhas];
 
       const csv =
         '\uFEFF' +
-        linhas
-          .map((linha) => linha.map(escapar).join(';'))
-          .join('\r\n');
+        linhas.map((linha) => linha.map(escapar).join(';')).join('\r\n');
 
       const blob = new Blob([csv], {
         type: 'text/csv;charset=utf-8;',
@@ -401,20 +383,15 @@ export class Exportacoes {
       );
     } catch (erro) {
       console.error(erro);
-      this.erroExportacao =
-        'Não foi possível gerar o arquivo CSV.';
+      this.erroExportacao = 'Não foi possível gerar o arquivo CSV.';
     } finally {
       this.gerando = false;
     }
   }
 
-
   formatarCelula(valor: string | number): string {
-    return typeof valor === 'number'
-      ? this.moeda.format(valor)
-      : valor;
+    return typeof valor === 'number' ? this.moeda.format(valor) : valor;
   }
-
 
   async gerarArquivo(): Promise<void> {
     const relatorio = this.documento;
@@ -450,18 +427,23 @@ export class Exportacoes {
         this.periodoExibido,
         this.modoRazao
           ? {
-            nomeArquivo:
-              `livro-razao-${this.inicioRazao}-a-${this.fimRazao}.xlsx`,
-            larguras: [10, 14, 48, 16, 16, 20],
-            colunasMonetarias: [4, 5, 6],
-          }
+              nomeArquivo: `livro-razao-${this.inicioRazao}-a-${this.fimRazao}.xlsx`,
+              larguras: [10, 14, 48, 16, 16, 20],
+              colunasMonetarias: [4, 5, 6],
+            }
           : this.modoBalancete
             ? {
-              nomeArquivo: `balancete-verificacao-${this.mes}.xlsx`,
-              larguras: [42, 20, 20, 20, 20],
-              colunasMonetarias: [2, 3, 4],
-            }
-            : undefined,
+                nomeArquivo: `balancete-verificacao-${this.mes}.xlsx`,
+                larguras: [42, 20, 20, 20, 20],
+                colunasMonetarias: [2, 3, 4],
+              }
+            : this.modoBalancoPatrimonial
+              ? {
+                  nomeArquivo: `balanco-patrimonial-${this.mes}.xlsx`,
+                  larguras: [14, 42, 22, 22, 16],
+                  colunasMonetarias: [],
+                }
+              : undefined,
       );
 
       await this.arquivoPronto.abrir(
@@ -471,9 +453,7 @@ export class Exportacoes {
       );
     } catch (erro) {
       console.error(erro);
-
-      this.erroExportacao =
-        'Não foi possível gerar o Excel. Tente novamente.';
+      this.erroExportacao = 'Não foi possível gerar o Excel. Tente novamente.';
     } finally {
       this.gerando = false;
     }

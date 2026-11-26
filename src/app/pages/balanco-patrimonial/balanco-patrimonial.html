@@ -6,6 +6,14 @@
   </div>
 
   <div class="bp-acoes">
+    <a
+      class="fs-botao bp-btn"
+      routerLink="/relatorios/balanco-patrimonial/exportar"
+      [queryParams]="{ tipo: 'balanco-patrimonial' }"
+    >
+      Exportar
+    </a>
+
     <button class="fs-botao bp-btn" type="button" (click)="gerarPdf()">
       Gerar PDF
     </button>
