@@ -1,4 +1,4 @@
-import { Lancamento } from "../lancamentos.service";
+import { Lancamento } from "../services/lancamentos.service";
 
 export function chaveConta(nome: string): string {
   const chave = nome.trim().replace(/\s+/g, ' ').toLocaleLowerCase('pt-BR');

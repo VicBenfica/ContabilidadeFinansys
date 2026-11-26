@@ -52,9 +52,11 @@ export class Exportacoes {
   }
 
   get consolidado(): boolean {
-    return this.tipo !== 'diario' && !this.modoRazao;
+    return !['diario', 'razao', 'plano-contas'].includes(this.tipo);
   }
-
+  get modoPlanoContas(): boolean {
+    return this.tipo === 'plano-contas';
+  }
   get inicioRazao(): string {
     return this.parametros().get('inicio') ?? '';
   }
@@ -111,6 +113,18 @@ export class Exportacoes {
 
     if (!this.mes) {
       return null;
+    } if (this.modoPlanoContas) {
+      return {
+        titulo: 'Plano de Contas',
+        colunas: ['Código', 'Conta contábil', 'Grupo', 'Subgrupo', 'Tipo'],
+        linhas: this.planoService.contas().map((conta) => [
+          conta.codigo,
+          conta.nome,
+          conta.grupo,
+          conta.subgrupo,
+          conta.tipo,
+        ]),
+      };
     }
 
     if (this.tipo === 'diario') {
@@ -152,7 +166,47 @@ export class Exportacoes {
       ]),
     };
   }
+  gerarCSV(): void {
+    const relatorio = this.documento;
+    const empresa = this.empresa();
 
+    if (!empresa || !relatorio?.linhas.length) return;
+
+    const escapar = (valor: string | number): string => {
+      let texto = String(valor ?? '');
+
+      if (/^\s*[=+\-@\t\r]/.test(texto)) {
+        texto = "'" + texto;
+      }
+
+      return `"${texto.replace(/"/g, '""')}"`;
+    };
+
+    const linhas = [
+      relatorio.colunas,
+      ...relatorio.linhas,
+    ];
+
+    const csv = '\uFEFF' + linhas
+      .map((linha) => linha.map(escapar).join(';'))
+      .join('\r\n');
+
+    const blob = new Blob([csv], {
+      type: 'text/csv;charset=utf-8;',
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = `plano-de-contas-${empresa.id}.csv`;
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
   formatarCelula(valor: string | number): string {
     return typeof valor === 'number'
       ? this.moeda.format(valor)
@@ -171,7 +225,10 @@ export class Exportacoes {
     ) {
       return;
     }
-
+    if (this.modoPlanoContas) {
+      this.gerarCSV();
+      return;
+    }
     this.erroExportacao = '';
 
     if (this.consolidado || this.formato === 'pdf') {
@@ -188,11 +245,11 @@ export class Exportacoes {
         this.periodoExibido,
         this.modoRazao
           ? {
-              nomeArquivo:
-                `livro-razao-${this.inicioRazao}-a-${this.fimRazao}.xlsx`,
-              larguras: [10, 14, 48, 16, 16, 20],
-              colunasMonetarias: [4, 5, 6],
-            }
+            nomeArquivo:
+              `livro-razao-${this.inicioRazao}-a-${this.fimRazao}.xlsx`,
+            larguras: [10, 14, 48, 16, 16, 20],
+            colunasMonetarias: [4, 5, 6],
+          }
           : undefined,
       );
     } catch (erro) {

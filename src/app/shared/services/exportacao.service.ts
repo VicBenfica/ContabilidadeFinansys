@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { LancamentosService } from './lancamentos.service';
-import { montarRazao } from './utils/livro-razao';
+import { montarRazao } from '../utils/livro-razao';
 export interface DocumentoExportacao {
     titulo: string;
     colunas: string[];

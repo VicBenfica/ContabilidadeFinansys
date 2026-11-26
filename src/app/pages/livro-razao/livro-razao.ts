@@ -9,7 +9,7 @@ import { LancamentosService } from '../../shared/services/lancamentos.service';
 import {
   chaveConta,
   montarRazao
-} from '../../shared/services/utils/livro-razao';
+} from '../../shared/utils/livro-razao';
 
 @Component({
   selector: 'app-livro-razao',
