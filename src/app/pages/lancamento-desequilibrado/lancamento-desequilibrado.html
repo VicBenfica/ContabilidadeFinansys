@@ -1,0 +1,78 @@
+<header class="ld-cabecalho">
+  <small>FINANSYS / ESCRITURAÇÃO</small>
+  <h1>Lançamento desequilibrado</h1>
+  <p>Exemplo de validação antes da contabilização.</p>
+</header>
+
+<section class="ld-card" aria-labelledby="ld-titulo-validacao">
+  <h2 id="ld-titulo-validacao">Os débitos não conferem com os créditos</h2>
+
+  <div class="ld-banner-resumo" role="status" aria-live="polite">
+    <span>
+      Débitos
+      <strong>
+        {{ totalDebitos() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+      </strong>
+    </span>
+
+    <span class="ld-separador" aria-hidden="true">•</span>
+
+    <span>
+      Créditos
+      <strong>
+        {{ totalCreditos() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+      </strong>
+    </span>
+
+    <span class="ld-separador" aria-hidden="true">•</span>
+
+    <span class="ld-destaque-diferenca">
+      Diferença
+      <strong>
+        {{ diferenca() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+      </strong>
+    </span>
+  </div>
+
+  <div class="fs-table-wrap">
+    <table
+      class="fs-table ld-tabela"
+      aria-label="Partidas do lançamento em validação"
+    >
+      <thead>
+        <tr>
+          <th scope="col">Natureza</th>
+          <th scope="col">Conta contábil</th>
+          <th scope="col">Valor</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (item of partidas(); track item.id) {
+          <tr>
+            <td class="ld-natureza">{{ item.natureza }}</td>
+            <td>{{ item.codigoConta }} · {{ item.nomeConta }}</td>
+            <td class="ld-valor">
+              {{ item.valor | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<div class="ld-acoes">
+  <a class="fs-botao ld-btn-voltar" routerLink="/livro-diario">
+    Voltar e corrigir
+  </a>
+
+  <button
+    class="fs-botao ld-btn-bloqueado"
+    type="button"
+    [disabled]="isDesequilibrado()"
+    aria-disabled="true"
+  >
+    Contabilizar (bloqueado)
+  </button>
+</div>

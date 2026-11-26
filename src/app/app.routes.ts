@@ -154,6 +154,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/estoque/estoque').then((m) => m.Estoque),
       },
+      {
+        path: 'livro-diario/lancamento-desequilibrado',
+        loadComponent: () =>
+          import('./pages/lancamento-desequilibrado/lancamento-desequilibrado').then(
+            (m) => m.LancamentoDesequilibrado,
+          ),
+      },
     ],
   },
 ];
