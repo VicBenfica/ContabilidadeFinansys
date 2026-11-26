@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-
 import { LancamentosService } from './lancamentos.service';
-
+import { montarRazao } from '../utils/livro-razao';
 export interface DocumentoExportacao {
     titulo: string;
     colunas: string[];
@@ -42,7 +41,40 @@ export class ExportacaoService {
             ),
         };
     }
+    gerarRazao(
+        empresaId: number,
+        conta: string,
+        inicio: string,
+        fim: string,
+    ): { conta: string; documento: DocumentoExportacao } | null {
+        const razao = montarRazao(this.lancamentos.listar(empresaId), conta, inicio, fim);
+        if (!razao) return null;
 
+        return {
+            conta: razao.conta,
+            documento: {
+                titulo: 'Livro Razão',
+                colunas: ['Nº', 'Data', 'Histórico', 'Débito', 'Crédito', 'Saldo (+D / −C)'],
+                linhas: [
+                    ['', '', 'Saldo inicial', '', '', razao.saldoInicial / 100],
+                    ...razao.movimentos.map((item) => [
+                        `#${item.numero}`,
+                        item.data.split('-').reverse().join('/'),
+                        item.historico,
+                        item.debito ? item.debito / 100 : '',
+                        item.credito ? item.credito / 100 : '',
+                        item.saldo / 100,
+                    ]),
+                    [
+                        '', '', 'Totais do período e saldo final',
+                        razao.debitos / 100,
+                        razao.creditos / 100,
+                        razao.saldoFinal / 100,
+                    ],
+                ],
+            },
+        };
+    }
     async baixarExcel(
         documento: DocumentoExportacao,
         empresa: string,
