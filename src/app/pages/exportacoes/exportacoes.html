@@ -3,8 +3,11 @@
 <div class="exp-tela">
     <header class="exp-cabecalho">
         <small>FINANSYS / ESCRITURAÇÃO</small>
+
         <h1>
-            {{ modoPlanoContas
+            {{ modoDfc
+            ? 'Exportar DFC'
+            : modoPlanoContas
             ? 'Exportar plano de contas'
             : modoRazao
             ? 'Exportar Livro Razão'
@@ -12,16 +15,21 @@
             ? 'Exportações da empresa'
             : 'Exportar Livro Diário' }}
         </h1>
-        <p>Confira o escopo e o formato do documento antes da exportação.</p>
+
+        <p>
+            Confira o escopo e o formato do documento antes da exportação.
+        </p>
     </header>
 
-    <app-card titulo="Opções de exportação" [descricao]="modoPlanoContas
-  ? 'Plano de contas completo, organizado por código e tipo.'
-  : modoRazao
-    ? 'Livro Razão · ' + (razaoExportado?.conta ?? 'Conta não disponível')
-    : consolidado
-      ? 'PDF consolidado · Diário, Razão, Balancete, Balanço, DRE e DFC'
-      : 'Resumo dos lançamentos do Livro Diário no período selecionado.'">
+    <app-card titulo="Opções de exportação" [descricao]="modoDfc
+      ? 'DFC · fluxos de caixa do período selecionado.'
+      : modoPlanoContas
+        ? 'Plano de contas completo, organizado por código e tipo.'
+        : modoRazao
+          ? 'Livro Razão · ' + (razaoExportado?.conta ?? 'Conta não disponível')
+          : consolidado
+            ? 'PDF consolidado · Diário, Razão, Balancete, Balanço, DRE e DFC'
+            : 'Resumo dos lançamentos do Livro Diário no período selecionado.'">
         <form (ngSubmit)="gerarArquivo()">
             <div class="exp-campos">
 
@@ -34,7 +42,7 @@
                 <label>
                     Período
 
-                    @if (modoRazao) {
+                    @if (modoDfc || modoRazao) {
                     <input type="text" [value]="periodoExibido" readonly />
                     } @else {
                     <input type="month" name="mes" [(ngModel)]="mes" required />
@@ -56,14 +64,19 @@
                     </select>
                     }
                 </label>
+
             </div>
 
             <div class="exp-acoes">
-                <a class="exp-botao" [routerLink]="modoRazao
-            ? '/livro-razao'
-            : consolidado
-              ? '/home'
-              : '/livro-diario'">
+                <a class="exp-botao" [routerLink]="modoDfc
+            ? '/relatorios/dfc'
+            : modoPlanoContas
+              ? '/plano-contas'
+              : modoRazao
+                ? '/livro-razao'
+                : consolidado
+                  ? '/home'
+                  : '/livro-diario'">
                     Voltar
                 </a>
 
@@ -77,7 +90,6 @@
                     ? 'Gerar PDF consolidado'
                     : 'Gerar arquivo' }}
                 </button>
-                
             </div>
 
             @if (erroExportacao) {
@@ -86,16 +98,17 @@
             </p>
             }
 
-            @if (modoRazao && !relatorio) {
+            @if ((modoRazao || modoDfc) && !relatorio) {
             <p class="exp-nota">
-                Não foi possível carregar o Livro Razão.
-                Volte à consulta e aplique os filtros da empresa selecionada.
+                Não foi possível carregar os dados da exportação.
+                Volte ao relatório e selecione os filtros novamente.
             </p>
-            } @else if (!consolidado && relatorio && relatorio.linhas.length === 0) {
+            } @else if (relatorio && relatorio.linhas.length === 0) {
             <p class="exp-nota">
-                Nenhum lançamento encontrado nesse período.
+                Nenhum registro encontrado para exportação.
             </p>
             }
+
         </form>
     </app-card>
 </div>

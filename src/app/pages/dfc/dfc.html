@@ -5,49 +5,30 @@
     <p>Demonstração dos Fluxos de Caixa pelo método direto.</p>
   </div>
 
+
   <div class="dfc-acoes">
-    <button class="fs-botao dfc-btn" type="button" (click)="gerarPdf()">
+    <button class="fs-botao dfc-btn" type="button" (click)="abrirExportacao('pdf')">
       Gerar PDF
     </button>
 
-    <button
-      class="fs-botao dfc-btn"
-      type="button"
-      [disabled]="gerandoExcel"
-      (click)="exportarExcel()"
-    >
-      {{ gerandoExcel ? 'Exportando…' : 'Exportar Excel' }}
+    <button class="fs-botao dfc-btn" type="button" (click)="abrirExportacao('xlsx')">
+      Exportar Excel
     </button>
   </div>
+
 </header>
 
 <nav class="dfc-abas" aria-label="Relatórios contábeis">
-  <a
-    class="dfc-aba"
-    routerLink="/relatorios/balancete"
-    routerLinkActive="dfc-aba-ativa"
-  >
+  <a class="dfc-aba" routerLink="/relatorios/balancete" routerLinkActive="dfc-aba-ativa">
     Balancete
   </a>
-  <a
-    class="dfc-aba"
-    routerLink="/relatorios/balanco-patrimonial"
-    routerLinkActive="dfc-aba-ativa"
-  >
+  <a class="dfc-aba" routerLink="/relatorios/balanco-patrimonial" routerLinkActive="dfc-aba-ativa">
     Balanço Patrimonial
   </a>
-  <a
-    class="dfc-aba"
-    routerLink="/relatorios/dre"
-    routerLinkActive="dfc-aba-ativa"
-  >
+  <a class="dfc-aba" routerLink="/relatorios/dre" routerLinkActive="dfc-aba-ativa">
     DRE
   </a>
-  <a
-    class="dfc-aba"
-    routerLink="/relatorios/dfc"
-    routerLinkActive="dfc-aba-ativa"
-  >
+  <a class="dfc-aba" routerLink="/relatorios/dfc" routerLinkActive="dfc-aba-ativa">
     DFC
   </a>
 </nav>
@@ -69,7 +50,7 @@
 </section>
 
 @if (erroExportacao) {
-  <p class="dfc-erro" role="alert">{{ erroExportacao }}</p>
+<p class="dfc-erro" role="alert">{{ erroExportacao }}</p>
 }
 
 <section class="dfc-resumo-cards" aria-label="Indicadores de caixa">
@@ -83,12 +64,8 @@
   <article class="dfc-kpi-card">
     <span class="dfc-kpi-label">Variação líquida</span>
     <strong class="dfc-kpi-valor">
-      @if (variacaoLiquida() < 0) {
-        ({{ -variacaoLiquida() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }})
-      } @else {
-        {{ variacaoLiquida() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
-      }
-    </strong>
+      @if (variacaoLiquida() < 0) { ({{ -variacaoLiquida() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}) } @else
+        { {{ variacaoLiquida() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }} } </strong>
   </article>
 
   <article class="dfc-kpi-card dfc-kpi-destaque">
@@ -112,17 +89,13 @@
 
       <tbody>
         @for (item of movimentos(); track item.id) {
-          <tr>
-            <td class="dfc-grupo">{{ item.grupo }}</td>
-            <td>{{ item.movimento }}</td>
-            <td class="dfc-valor">
-              @if (item.valor < 0) {
-                ({{ -item.valor | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }})
-              } @else {
-                {{ item.valor | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
-              }
-            </td>
-          </tr>
+        <tr>
+          <td class="dfc-grupo">{{ item.grupo }}</td>
+          <td>{{ item.movimento }}</td>
+          <td class="dfc-valor">
+            @if (item.valor < 0) { ({{ -item.valor | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}) } @else { {{
+              item.valor | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }} } </td>
+        </tr>
         }
       </tbody>
     </table>

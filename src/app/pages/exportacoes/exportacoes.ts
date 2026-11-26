@@ -52,12 +52,13 @@ export class Exportacoes {
   }
 
   get consolidado(): boolean {
-    return !['diario', 'razao', 'plano-contas'].includes(this.tipo);
+    return !['diario', 'razao', 'plano-contas', 'dfc'].includes(this.tipo);
   }
   get modoPlanoContas(): boolean {
     return this.tipo === 'plano-contas';
   }
   get nomeRelatorio(): string {
+    if (this.modoDfc) return 'DFC';
     if (this.modoPlanoContas) return 'Plano de Contas';
     if (this.modoRazao) return 'Livro Razão';
     if (this.tipo === 'diario') return 'Livro Diário';
@@ -66,11 +67,18 @@ export class Exportacoes {
   }
 
   get origemExportacao(): string {
+    if (this.modoDfc) return '/relatorios/dfc';
     if (this.modoPlanoContas) return '/plano-contas';
     if (this.modoRazao) return '/livro-razao';
     if (this.tipo === 'diario') return '/livro-diario';
 
     return '/home';
+  } get dfcExportada() {
+    const empresa = this.empresa();
+
+    if (!this.modoDfc || !empresa) return null;
+
+    return this.exportacao.obterDfc(empresa.id);
   }
   get inicioRazao(): string {
     return this.parametros().get('inicio') ?? '';
@@ -101,6 +109,9 @@ export class Exportacoes {
   }
 
   get periodoExibido(): string {
+    if (this.modoDfc) {
+      return this.dfcExportada?.periodo ?? 'Período não disponível';
+    }
     if (!this.modoRazao) {
       return this.mes;
     }
@@ -117,7 +128,9 @@ export class Exportacoes {
 
   get documento(): DocumentoExportacao | null {
     const empresa = this.empresa();
-
+    if (this.modoDfc) {
+      return this.dfcExportada?.documento ?? null;
+    }
     if (!empresa) {
       return null;
     }
@@ -252,7 +265,9 @@ export class Exportacoes {
       ? this.moeda.format(valor)
       : valor;
   }
-
+  get modoDfc(): boolean {
+    return this.tipo === 'dfc';
+  }
   async gerarArquivo(): Promise<void> {
     const relatorio = this.documento;
     const empresa = this.empresa();
