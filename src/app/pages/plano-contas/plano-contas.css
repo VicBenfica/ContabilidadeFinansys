@@ -28,6 +28,48 @@
 
 .pc-acoes {
   display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pc-acoes .pc-botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 40px;
+  padding: 10px 16px;
+
+  border: 1px solid var(--fs-borda, #e7e0f0);
+  border-radius: 8px;
+
+  background: #fff;
+  color: var(--fs-texto, #211738);
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-decoration: none;
+
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.pc-acoes .pc-botao:hover {
+  background: #f6f4ff;
+  border-color: var(--fs-roxo, #6041b0);
+}
+
+.pc-acoes .pc-botao:focus-visible {
+  outline: 2px solid var(--fs-roxo, #6041b0);
+  outline-offset: 2px;
+}
+
+
+.pc-acoes {
+  display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
@@ -250,6 +292,7 @@ app-card .fs-table-wrap {
 }
 
 @media (max-width: 560px) {
+
   .pc-filtros,
   .pc-modal-grid {
     grid-template-columns: 1fr;
