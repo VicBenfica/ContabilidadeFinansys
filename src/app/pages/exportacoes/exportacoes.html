@@ -11,9 +11,11 @@
             ? 'Exportar Livro Razão'
             : modoBalancete
               ? 'Exportar Balancete'
-              : consolidado
-                ? 'Exportações da empresa'
-                : 'Exportar Livro Diário'
+              : modoBalancoPatrimonial
+                ? 'Exportar Balanço Patrimonial'
+                : consolidado
+                  ? 'Exportações da empresa'
+                  : 'Exportar Livro Diário'
       }}
     </h1>
     <p>Confira o escopo e o formato do documento antes da exportação.</p>
@@ -28,9 +30,11 @@
           ? 'Livro Razão · ' + (razaoExportado?.conta ?? 'Conta não disponível')
           : modoBalancete
             ? 'Balancete de verificação · saldos e movimentações'
-            : consolidado
-              ? 'PDF consolidado · Diário, Razão, Balancete, Balanço, DRE e DFC'
-              : 'Resumo dos lançamentos do Livro Diário no período selecionado.'
+            : modoBalancoPatrimonial
+              ? 'Balanço Patrimonial · posição acumulada'
+              : consolidado
+                ? 'PDF consolidado · Diário, Razão, Balancete, Balanço, DRE e DFC'
+                : 'Resumo dos lançamentos do Livro Diário no período selecionado.'
     "
   >
     <form (ngSubmit)="gerarArquivo()">
@@ -82,9 +86,11 @@
                 ? '/livro-razao'
                 : modoBalancete
                   ? '/relatorios/balancete'
-                  : consolidado
-                    ? '/home'
-                    : '/livro-diario'
+                  : modoBalancoPatrimonial
+                    ? '/relatorios/balanco-patrimonial'
+                    : consolidado
+                      ? '/home'
+                      : '/livro-diario'
           "
         >
           Voltar

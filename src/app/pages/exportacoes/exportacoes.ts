@@ -47,11 +47,18 @@ export class Exportacoes {
     if (this.router.url.includes('/relatorios/balancete/exportar')) {
       return 'balancete';
     }
+    if (this.router.url.includes('/relatorios/balanco-patrimonial/exportar')) {
+      return 'balanco-patrimonial';
+    }
     return this.parametros().get('tipo') ?? 'consolidado';
   }
 
   get modoBalancete(): boolean {
     return this.tipo === 'balancete';
+  }
+
+  get modoBalancoPatrimonial(): boolean {
+    return this.tipo === 'balanco-patrimonial';
   }
 
   get modoRazao(): boolean {
@@ -63,7 +70,13 @@ export class Exportacoes {
   }
 
   get consolidado(): boolean {
-    return !['diario', 'razao', 'plano-contas', 'balancete'].includes(this.tipo);
+    return ![
+      'diario',
+      'razao',
+      'plano-contas',
+      'balancete',
+      'balanco-patrimonial',
+    ].includes(this.tipo);
   }
 
   get inicioRazao(): string {
@@ -149,6 +162,23 @@ export class Exportacoes {
           conta.subgrupo,
           conta.tipo,
         ]),
+      };
+    }
+
+    if (this.modoBalancoPatrimonial) {
+      return {
+        titulo: 'Balanço Patrimonial',
+        colunas: ['Código', 'Conta contábil', 'Grupo', 'Subgrupo', 'Tipo'],
+        linhas: this.planoService
+          .contas()
+          .filter((conta) => conta.grupo === 'Ativo' || conta.grupo === 'Passivo' || conta.grupo === 'Patrimônio Líquido')
+          .map((conta) => [
+            conta.codigo,
+            conta.nome,
+            conta.grupo,
+            conta.subgrupo,
+            conta.tipo,
+          ]),
       };
     }
 
@@ -267,7 +297,13 @@ export class Exportacoes {
                 larguras: [14, 42, 22, 22, 16],
                 colunasMonetarias: [],
               }
-            : undefined,
+            : this.modoBalancoPatrimonial
+              ? {
+                  nomeArquivo: `balanco-patrimonial-${this.mes}.xlsx`,
+                  larguras: [14, 42, 22, 22, 16],
+                  colunasMonetarias: [],
+                }
+              : undefined,
       );
     } catch (erro) {
       console.error(erro);

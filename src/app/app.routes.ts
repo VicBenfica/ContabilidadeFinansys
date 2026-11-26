@@ -146,6 +146,11 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'relatorios/balanco-patrimonial/exportar',
+        loadComponent: () =>
+          import('./pages/exportacoes/exportacoes').then((m) => m.Exportacoes),
+      },
+      {
         path: 'relatorios/balanco-patrimonial',
         loadComponent: () =>
           import('./pages/balanco-patrimonial/balanco-patrimonial').then(
