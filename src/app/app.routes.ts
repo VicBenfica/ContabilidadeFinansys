@@ -122,6 +122,11 @@ export const routes: Routes = [
 
       // RELATÓRIOS
       {
+        path: 'relatorios/balancete/exportar',
+        loadComponent: () =>
+          import('./pages/exportacoes/exportacoes').then((m) => m.Exportacoes),
+      },
+      {
         path: 'relatorios',
         redirectTo: 'relatorios/balancete',
         pathMatch: 'full',

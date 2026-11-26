@@ -1,9 +1,8 @@
-
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { ArquivoProntoService } from '../../shared/services/arquivo-pronto.service';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+
 import { Card } from '../../shared/components/card/card';
 import { EmpresasService } from '../../shared/services/empresas.service';
 import {
@@ -21,9 +20,10 @@ import { PlanoContasService } from '../../shared/services/plano-contas.service';
 })
 export class Exportacoes {
   private readonly rota = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly exportacao = inject(ExportacaoService);
   private readonly planoService = inject(PlanoContasService);
-  private readonly arquivoPronto = inject(ArquivoProntoService);
+
   readonly empresa = inject(EmpresasService).selecionada;
 
   private readonly parametros = toSignal(this.rota.queryParamMap, {
@@ -44,42 +44,28 @@ export class Exportacoes {
   });
 
   get tipo(): string {
+    if (this.router.url.includes('/relatorios/balancete/exportar')) {
+      return 'balancete';
+    }
     return this.parametros().get('tipo') ?? 'consolidado';
+  }
+
+  get modoBalancete(): boolean {
+    return this.tipo === 'balancete';
   }
 
   get modoRazao(): boolean {
     return this.tipo === 'razao';
   }
 
-  get consolidado(): boolean {
-    return !['diario', 'razao', 'plano-contas', 'dfc'].includes(this.tipo);
-  }
   get modoPlanoContas(): boolean {
     return this.tipo === 'plano-contas';
   }
-  get nomeRelatorio(): string {
-    if (this.modoDfc) return 'DFC';
-    if (this.modoPlanoContas) return 'Plano de Contas';
-    if (this.modoRazao) return 'Livro Razão';
-    if (this.tipo === 'diario') return 'Livro Diário';
 
-    return 'Relatório Contábil Consolidado';
+  get consolidado(): boolean {
+    return !['diario', 'razao', 'plano-contas', 'balancete'].includes(this.tipo);
   }
 
-  get origemExportacao(): string {
-    if (this.modoDfc) return '/relatorios/dfc';
-    if (this.modoPlanoContas) return '/plano-contas';
-    if (this.modoRazao) return '/livro-razao';
-    if (this.tipo === 'diario') return '/livro-diario';
-
-    return '/home';
-  } get dfcExportada() {
-    const empresa = this.empresa();
-
-    if (!this.modoDfc || !empresa) return null;
-
-    return this.exportacao.obterDfc(empresa.id);
-  }
   get inicioRazao(): string {
     return this.parametros().get('inicio') ?? '';
   }
@@ -109,9 +95,6 @@ export class Exportacoes {
   }
 
   get periodoExibido(): string {
-    if (this.modoDfc) {
-      return this.dfcExportada?.periodo ?? 'Período não disponível';
-    }
     if (!this.modoRazao) {
       return this.mes;
     }
@@ -128,9 +111,7 @@ export class Exportacoes {
 
   get documento(): DocumentoExportacao | null {
     const empresa = this.empresa();
-    if (this.modoDfc) {
-      return this.dfcExportada?.documento ?? null;
-    }
+
     if (!empresa) {
       return null;
     }
@@ -141,7 +122,9 @@ export class Exportacoes {
 
     if (!this.mes) {
       return null;
-    } if (this.modoPlanoContas) {
+    }
+
+    if (this.modoPlanoContas) {
       return {
         titulo: 'Plano de Contas',
         colunas: ['Código', 'Conta contábil', 'Grupo', 'Subgrupo', 'Tipo'],
@@ -155,17 +138,25 @@ export class Exportacoes {
       };
     }
 
-    if (this.tipo === 'diario') {
-      return this.exportacao.gerarDiario(
-        empresa.id,
-        this.mes,
-      );
+    if (this.modoBalancete) {
+      return {
+        titulo: 'Balancete de Verificação',
+        colunas: ['Código', 'Conta contábil', 'Grupo', 'Subgrupo', 'Tipo'],
+        linhas: this.planoService.contas().map((conta) => [
+          conta.codigo,
+          conta.nome,
+          conta.grupo,
+          conta.subgrupo,
+          conta.tipo,
+        ]),
+      };
     }
 
-    const diario = this.exportacao.gerarDiario(
-      empresa.id,
-      this.mes,
-    );
+    if (this.tipo === 'diario') {
+      return this.exportacao.gerarDiario(empresa.id, this.mes);
+    }
+
+    const diario = this.exportacao.gerarDiario(empresa.id, this.mes);
 
     if (diario.linhas.length > 0) {
       return {
@@ -178,13 +169,7 @@ export class Exportacoes {
     return {
       titulo:
         'Relatório Contábil Consolidado (Diário, Razão, Balancete, Balanço, DRE e DFC)',
-      colunas: [
-        'Código',
-        'Conta contábil',
-        'Grupo',
-        'Subgrupo',
-        'Tipo',
-      ],
+      colunas: ['Código', 'Conta contábil', 'Grupo', 'Subgrupo', 'Tipo'],
       linhas: this.planoService.contas().map((conta) => [
         conta.codigo,
         conta.nome,
@@ -195,79 +180,49 @@ export class Exportacoes {
     };
   }
 
-  async gerarCSV(): Promise<void> {
+  gerarCSV(): void {
     const relatorio = this.documento;
     const empresa = this.empresa();
 
-    if (!empresa || !relatorio?.linhas.length || this.gerando) {
-      return;
-    }
+    if (!empresa || !relatorio?.linhas.length) return;
 
-    this.gerando = true;
-    this.erroExportacao = '';
+    const escapar = (valor: string | number): string => {
+      let texto = String(valor ?? '');
 
-    try {
-      const escapar = (valor: string | number): string => {
-        let texto = String(valor ?? '');
-
-        if (/^\s*[=+\-@\t\r]/.test(texto)) {
-          texto = "'" + texto;
-        }
-
-        return `"${texto.replace(/"/g, '""')}"`;
-      };
-
-      const linhas = [
-        relatorio.colunas,
-        ...relatorio.linhas,
-      ];
-
-      const csv = '\uFEFF' + linhas
-        .map((linha) => linha.map(escapar).join(';'))
-        .join('\r\n');
-
-      const blob = new Blob([csv], {
-        type: 'text/csv;charset=utf-8;',
-      });
-
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-
-      try {
-        link.href = url;
-        link.download = `plano-de-contas-${empresa.id}.csv`;
-
-        document.body.appendChild(link);
-        link.click();
-
-      } finally {
-        link.remove();
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      if (/^\s*[=+\-@\t\r]/.test(texto)) {
+        texto = "'" + texto;
       }
 
-      await this.arquivoPronto.abrir(
-        'Plano de Contas',
-        'CSV',
-        '/plano-contas',
-      );
+      return `"${texto.replace(/"/g, '""')}"`;
+    };
 
-    } catch (erro) {
-      console.error(erro);
-      this.erroExportacao =
-        'Não foi possível gerar o arquivo CSV.';
-    } finally {
-      this.gerando = false;
-    }
+    const linhas = [relatorio.colunas, ...relatorio.linhas];
+
+    const csv =
+      '\uFEFF' +
+      linhas.map((linha) => linha.map(escapar).join(';')).join('\r\n');
+
+    const blob = new Blob([csv], {
+      type: 'text/csv;charset=utf-8;',
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = `plano-de-contas-${empresa.id}.csv`;
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
   formatarCelula(valor: string | number): string {
-    return typeof valor === 'number'
-      ? this.moeda.format(valor)
-      : valor;
+    return typeof valor === 'number' ? this.moeda.format(valor) : valor;
   }
-  get modoDfc(): boolean {
-    return this.tipo === 'dfc';
-  }
+
   async gerarArquivo(): Promise<void> {
     const relatorio = this.documento;
     const empresa = this.empresa();
@@ -280,10 +235,12 @@ export class Exportacoes {
     ) {
       return;
     }
+
     if (this.modoPlanoContas) {
-      await this.gerarCSV();
+      this.gerarCSV();
       return;
     }
+
     this.erroExportacao = '';
 
     if (this.consolidado || this.formato === 'pdf') {
@@ -300,17 +257,17 @@ export class Exportacoes {
         this.periodoExibido,
         this.modoRazao
           ? {
-            nomeArquivo:
-              `livro-razao-${this.inicioRazao}-a-${this.fimRazao}.xlsx`,
-            larguras: [10, 14, 48, 16, 16, 20],
-            colunasMonetarias: [4, 5, 6],
-          }
-          : undefined,
-      );
-      await this.arquivoPronto.abrir(
-        this.nomeRelatorio,
-        'Excel (.xlsx)',
-        this.origemExportacao,
+              nomeArquivo: `livro-razao-${this.inicioRazao}-a-${this.fimRazao}.xlsx`,
+              larguras: [10, 14, 48, 16, 16, 20],
+              colunasMonetarias: [4, 5, 6],
+            }
+          : this.modoBalancete
+            ? {
+                nomeArquivo: `balancete-verificacao-${this.mes}.xlsx`,
+                larguras: [14, 42, 22, 22, 16],
+                colunasMonetarias: [],
+              }
+            : undefined,
       );
     } catch (erro) {
       console.error(erro);

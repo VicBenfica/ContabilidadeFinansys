@@ -1,148 +1,160 @@
 @let relatorio = documento;
 
 <div class="exp-tela">
-    <header class="exp-cabecalho">
-        <small>FINANSYS / ESCRITURAÇÃO</small>
-
-        <h1>
-            {{ modoDfc
-            ? 'Exportar DFC'
-            : modoPlanoContas
-            ? 'Exportar plano de contas'
-            : modoRazao
+  <header class="exp-cabecalho">
+    <small>FINANSYS / ESCRITURAÇÃO</small>
+    <h1>
+      {{
+        modoPlanoContas
+          ? 'Exportar plano de contas'
+          : modoRazao
             ? 'Exportar Livro Razão'
-            : consolidado
-            ? 'Exportações da empresa'
-            : 'Exportar Livro Diário' }}
-        </h1>
+            : modoBalancete
+              ? 'Exportar Balancete'
+              : consolidado
+                ? 'Exportações da empresa'
+                : 'Exportar Livro Diário'
+      }}
+    </h1>
+    <p>Confira o escopo e o formato do documento antes da exportação.</p>
+  </header>
 
-        <p>
-            Confira o escopo e o formato do documento antes da exportação.
-        </p>
-    </header>
-
-    <app-card titulo="Opções de exportação" [descricao]="modoDfc
-      ? 'DFC · fluxos de caixa do período selecionado.'
-      : modoPlanoContas
+  <app-card
+    titulo="Opções de exportação"
+    [descricao]="
+      modoPlanoContas
         ? 'Plano de contas completo, organizado por código e tipo.'
         : modoRazao
           ? 'Livro Razão · ' + (razaoExportado?.conta ?? 'Conta não disponível')
-          : consolidado
-            ? 'PDF consolidado · Diário, Razão, Balancete, Balanço, DRE e DFC'
-            : 'Resumo dos lançamentos do Livro Diário no período selecionado.'">
-        <form (ngSubmit)="gerarArquivo()">
-            <div class="exp-campos">
+          : modoBalancete
+            ? 'Balancete de verificação · saldos e movimentações'
+            : consolidado
+              ? 'PDF consolidado · Diário, Razão, Balancete, Balanço, DRE e DFC'
+              : 'Resumo dos lançamentos do Livro Diário no período selecionado.'
+    "
+  >
+    <form (ngSubmit)="gerarArquivo()">
+      <div class="exp-campos">
+        <label>
+          Empresa
+          <input
+            type="text"
+            [value]="empresa()?.nomeFantasia ?? 'Nenhuma empresa selecionada'"
+            readonly
+          />
+        </label>
 
-                <label>
-                    Empresa
-                    <input type="text" [value]="empresa()?.nomeFantasia ?? 'Nenhuma empresa selecionada'" readonly />
-                </label>
+        @if (!modoPlanoContas) {
+          <label>
+            Período
 
-                @if (!modoPlanoContas) {
-                <label>
-                    Período
+            @if (modoRazao) {
+              <input type="text" [value]="periodoExibido" readonly />
+            } @else {
+              <input type="month" name="mes" [(ngModel)]="mes" required />
+            }
+          </label>
+        }
 
-                    @if (modoDfc || modoRazao) {
-                    <input type="text" [value]="periodoExibido" readonly />
-                    } @else {
-                    <input type="month" name="mes" [(ngModel)]="mes" required />
-                    }
-                </label>
-                }
+        <label>
+          Formato
 
-                <label>
-                    Formato
+          @if (modoPlanoContas) {
+            <input type="text" value="CSV" readonly />
+          } @else if (consolidado) {
+            <input type="text" value="PDF" readonly />
+          } @else {
+            <select name="formato" [(ngModel)]="formato">
+              <option value="pdf">PDF</option>
+              <option value="xlsx">Excel (.xlsx)</option>
+            </select>
+          }
+        </label>
+      </div>
 
-                    @if (modoPlanoContas) {
-                    <input type="text" value="CSV" readonly />
-                    } @else if (consolidado) {
-                    <input type="text" value="PDF" readonly />
-                    } @else {
-                    <select name="formato" [(ngModel)]="formato">
-                        <option value="pdf">PDF</option>
-                        <option value="xlsx">Excel (.xlsx)</option>
-                    </select>
-                    }
-                </label>
-
-            </div>
-
-            <div class="exp-acoes">
-                <a class="exp-botao" [routerLink]="modoDfc
-            ? '/relatorios/dfc'
-            : modoPlanoContas
+      <div class="exp-acoes">
+        <a
+          class="exp-botao"
+          [routerLink]="
+            modoPlanoContas
               ? '/plano-contas'
               : modoRazao
                 ? '/livro-razao'
+                : modoBalancete
+                  ? '/relatorios/balancete'
+                  : consolidado
+                    ? '/home'
+                    : '/livro-diario'
+          "
+        >
+          Voltar
+        </a>
+
+        <button
+          class="exp-botao exp-primario"
+          type="submit"
+          [disabled]="!relatorio || relatorio.linhas.length === 0 || gerando"
+        >
+          {{
+            gerando
+              ? 'Gerando…'
+              : modoPlanoContas
+                ? 'Gerar CSV'
                 : consolidado
-                  ? '/home'
-                  : '/livro-diario'">
-                    Voltar
-                </a>
+                  ? 'Gerar PDF consolidado'
+                  : 'Gerar arquivo'
+          }}
+        </button>
+      </div>
 
-                <button class="exp-botao exp-primario" type="submit"
-                    [disabled]="!relatorio || relatorio.linhas.length === 0 || gerando">
-                    {{ gerando
-                    ? 'Gerando…'
-                    : modoPlanoContas
-                    ? 'Gerar CSV'
-                    : consolidado
-                    ? 'Gerar PDF consolidado'
-                    : 'Gerar arquivo' }}
-                </button>
-            </div>
+      @if (erroExportacao) {
+        <p class="exp-nota" role="alert">
+          {{ erroExportacao }}
+        </p>
+      }
 
-            @if (erroExportacao) {
-            <p class="exp-nota" role="alert">
-                {{ erroExportacao }}
-            </p>
-            }
-
-            @if ((modoRazao || modoDfc) && !relatorio) {
-            <p class="exp-nota">
-                Não foi possível carregar os dados da exportação.
-                Volte ao relatório e selecione os filtros novamente.
-            </p>
-            } @else if (relatorio && relatorio.linhas.length === 0) {
-            <p class="exp-nota">
-                Nenhum registro encontrado para exportação.
-            </p>
-            }
-
-        </form>
-    </app-card>
+      @if (modoRazao && !relatorio) {
+        <p class="exp-nota">
+          Não foi possível carregar o Livro Razão.
+          Volte à consulta e aplique os filtros da empresa selecionada.
+        </p>
+      } @else if (!consolidado && relatorio && relatorio.linhas.length === 0) {
+        <p class="exp-nota">
+          Nenhum lançamento encontrado nesse período.
+        </p>
+      }
+    </form>
+  </app-card>
 </div>
 
 @if (relatorio) {
-<section class="exp-impressao">
+  <section class="exp-impressao">
     <h1>{{ relatorio.titulo }}</h1>
 
-    <p>
-        {{ empresa()?.nomeFantasia }} · Período: {{ periodoExibido }}
-    </p>
+    <p>{{ empresa()?.nomeFantasia }} · Período: {{ periodoExibido }}</p>
 
     @if (modoRazao) {
-    <p>Conta contábil: {{ razaoExportado?.conta }}</p>
+      <p>Conta contábil: {{ razaoExportado?.conta }}</p>
     }
 
     <table>
-        <thead>
-            <tr>
-                @for (coluna of relatorio.colunas; track $index) {
-                <th scope="col">{{ coluna }}</th>
-                }
-            </tr>
-        </thead>
+      <thead>
+        <tr>
+          @for (coluna of relatorio.colunas; track $index) {
+            <th scope="col">{{ coluna }}</th>
+          }
+        </tr>
+      </thead>
 
-        <tbody>
-            @for (linha of relatorio.linhas; track $index) {
-            <tr>
-                @for (valor of linha; track $index) {
-                <td>{{ formatarCelula(valor) }}</td>
-                }
-            </tr>
+      <tbody>
+        @for (linha of relatorio.linhas; track $index) {
+          <tr>
+            @for (valor of linha; track $index) {
+              <td>{{ formatarCelula(valor) }}</td>
             }
-        </tbody>
+          </tr>
+        }
+      </tbody>
     </table>
-</section>
+  </section>
 }
