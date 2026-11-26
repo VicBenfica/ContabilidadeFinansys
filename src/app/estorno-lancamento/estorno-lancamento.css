@@ -1,0 +1,144 @@
+.el-cabecalho {
+  margin-bottom: 18px;
+}
+
+.el-cabecalho small {
+  color: var(--fs-roxo);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+}
+
+.el-cabecalho h1 {
+  margin: 4px 0;
+  font-size: 30px;
+  line-height: 1.2;
+}
+
+.el-cabecalho p {
+  margin: 6px 0 0;
+  color: var(--fs-suave);
+  font-size: 13px;
+}
+
+.el-formulario {
+  display: grid;
+  gap: 16px;
+}
+
+.el-card {
+  padding: 22px 24px;
+  border: 1px solid var(--fs-borda, #e7e0f0);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.el-card h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--fs-texto);
+}
+
+.el-subtitulo {
+  margin: 4px 0 18px;
+  color: var(--fs-suave);
+  font-size: 12px;
+}
+
+.el-grid-campos {
+  display: grid;
+  grid-template-columns: 180px minmax(260px, 1fr);
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.el-card label {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fs-texto);
+}
+
+.el-card input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 38px;
+  padding: 8px 12px;
+  border: 1px solid var(--fs-borda, #e7e0f0);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--fs-texto);
+  font: inherit;
+  font-size: 13px;
+}
+
+.el-card input:focus {
+  outline: none;
+  border-color: var(--fs-roxo);
+  box-shadow: 0 0 0 3px rgba(96, 65, 176, 0.12);
+}
+
+.el-tabela tbody tr:nth-child(even) {
+  background: #f9f6fe;
+}
+
+.el-conta {
+  color: var(--fs-roxo);
+  font-weight: 600;
+}
+
+.el-traco {
+  color: var(--fs-suave);
+}
+
+.el-erro {
+  margin: 0;
+  color: #b42318;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.el-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.el-btn-cancelar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.el-btn-cancelar:hover {
+  background: #f8f5ff;
+  border-color: #d5c8eb;
+}
+
+.el-btn-confirmar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 22px;
+  border-color: var(--fs-roxo);
+  background: var(--fs-roxo);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.el-btn-confirmar:hover {
+  filter: brightness(1.06);
+}
+
+@media (max-width: 640px) {
+  .el-grid-campos {
+    grid-template-columns: 1fr;
+  }
+}
