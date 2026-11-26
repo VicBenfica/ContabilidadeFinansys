@@ -56,7 +56,18 @@ export class Exportacoes {
     this.gerando = true;
 
     try {
-      await this.exportacao.baixarExcel(relatorio, empresa.nomeFantasia, this.mes);
+      await this.exportacao.baixarExcel(
+        relatorio,
+        empresa.nomeFantasia,
+        this.periodoExibido,
+        this.modoRazao
+          ? {
+            nomeArquivo: `livro-razao-${this.inicioRazao}-a-${this.fimRazao}.xlsx`,
+            larguras: [10, 14, 48, 16, 16, 20],
+            colunasMonetarias: [4, 5, 6],
+          }
+          : undefined,
+      );
     } catch {
       this.erroExportacao = 'Não foi possível gerar o Excel. Tente novamente.';
     } finally {
@@ -65,13 +76,60 @@ export class Exportacoes {
   }
   mes = '2026-11';
 
+  get tipo(): string {
+    return this.parametros().get('tipo') ?? 'consolidado';
+  }
+
   get consolidado(): boolean {
-    return this.parametros().get('tipo') !== 'diario';
+    return this.tipo !== 'diario' && this.tipo !== 'razao';
+  }
+
+  get modoRazao(): boolean {
+    return this.tipo === 'razao';
+  }
+
+  get inicioRazao(): string {
+    return this.parametros().get('inicio') ?? '';
+  }
+
+  get fimRazao(): string {
+    return this.parametros().get('fim') ?? '';
+  }
+
+  get razaoExportado() {
+    const empresa = this.empresa();
+    const parametros = this.parametros();
+
+    if (
+      !this.modoRazao ||
+      !empresa ||
+      parametros.get('empresaId') !== String(empresa.id)
+    ) {
+      return null;
+    }
+
+    return this.exportacao.gerarRazao(
+      empresa.id,
+      parametros.get('conta') ?? '',
+      this.inicioRazao,
+      this.fimRazao,
+    );
+  }
+
+  get periodoExibido(): string {
+    if (!this.modoRazao) return this.mes;
+    if (!this.inicioRazao || !this.fimRazao) return 'Período não informado';
+
+    const inicio = this.inicioRazao.split('-').reverse().join('/');
+    const fim = this.fimRazao.split('-').reverse().join('/');
+
+    return `${inicio} a ${fim}`;
   }
 
   get documento(): DocumentoExportacao | null {
-    const empresa = this.empresa();
+    if (this.modoRazao) return this.razaoExportado?.documento ?? null;
 
+    const empresa = this.empresa();
     if (!empresa || !this.mes || this.consolidado) return null;
 
     return this.exportacao.gerarDiario(empresa.id, this.mes);

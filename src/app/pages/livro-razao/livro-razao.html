@@ -4,17 +4,43 @@
         <h1>Livro Razão</h1>
         <p>Consulte os débitos, créditos e a evolução do saldo por conta contábil.</p>
     </div>
+
     <div class="ld-acoes lr-exportar">
-        <button type="button" class="ld-botao" [disabled]="!relatorio || exportandoExcel" (click)="gerarPdf()">
+        @if (parametrosExportacao; as params) {
+        <a class="ld-botao" routerLink="/livro-razao/exportar" [queryParams]="{
+        tipo: params.tipo,
+        empresaId: params.empresaId,
+        conta: params.conta,
+        inicio: params.inicio,
+        fim: params.fim,
+        formato: 'pdf'
+      }">
+            Gerar PDF
+        </a>
+
+        <a class="ld-botao" routerLink="/livro-razao/exportar" [queryParams]="{
+        tipo: params.tipo,
+        empresaId: params.empresaId,
+        conta: params.conta,
+        inicio: params.inicio,
+        fim: params.fim,
+        formato: 'xlsx'
+      }">
+            Exportar Excel
+        </a>
+        } @else {
+        <button class="ld-botao" type="button" disabled>
             Gerar PDF
         </button>
 
-        <button type="button" class="ld-botao" [disabled]="!relatorio || exportandoExcel" (click)="exportarExcel()">
-            {{ exportandoExcel ? 'Gerando…' : 'Exportar Excel' }}
+        <button class="ld-botao" type="button" disabled>
+            Exportar Excel
         </button>
-    </div>@if (erroExportacao) {
-    <p class="ld-erro lr-erro-exportacao" role="alert">{{ erroExportacao }}</p>
-    }
+        }
+    </div>
+
+
+
 </header>
 
 @let opcoes = contas;
