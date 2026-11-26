@@ -1,0 +1,82 @@
+<header class="me-cabecalho">
+  <div>
+    <small>FINANSYS / ESCRITURAÇÃO</small>
+    <h1>Movimentações de estoque</h1>
+    <p>Confira a quantidade e o custo de cada entrada e saída.</p>
+  </div>
+
+  <a class="fs-botao me-voltar" routerLink="/estoque">Voltar ao estoque</a>
+</header>
+
+<section class="me-filtros-card" aria-label="Filtros de movimentações de estoque">
+  <form class="me-filtros" (ngSubmit)="aplicarFiltros()">
+    <label>
+      Produto
+      <select name="produtoId" [(ngModel)]="filtros.produtoId">
+        @for (prod of produtos(); track prod.id) {
+          <option [value]="prod.id">{{ prod.nome }}</option>
+        }
+      </select>
+    </label>
+
+    <label>
+      Data inicial
+      <input type="date" name="dataInicial" [(ngModel)]="filtros.dataInicial" />
+    </label>
+
+    <label>
+      Data final
+      <input type="date" name="dataFinal" [(ngModel)]="filtros.dataFinal" />
+    </label>
+
+    <button class="fs-botao me-filtrar" type="submit">Aplicar filtros</button>
+  </form>
+</section>
+
+<app-card [titulo]="tituloCard()">
+  @let lista = movimentacoesFiltradas();
+
+  @if (lista.length > 0) {
+    <div class="fs-table-wrap">
+      <table
+        class="fs-table me-tabela"
+        aria-label="Tabela de histórico de movimentações do produto"
+      >
+        <thead>
+          <tr>
+            <th scope="col">Referência</th>
+            <th scope="col">Data</th>
+            <th scope="col">Movimento</th>
+            <th scope="col">Variação</th>
+            <th scope="col">Custo</th>
+            <th scope="col">Saldo após movimento</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (item of lista; track item.referencia) {
+            <tr>
+              <td>
+                <a
+                  class="me-link-referencia"
+                  [routerLink]="['/livro-diario/lancamentos', item.referencia]"
+                >
+                  #{{ item.referencia }}
+                </a>
+              </td>
+              <td>{{ item.dataExibicao }}</td>
+              <td>{{ item.movimento }}</td>
+              <td>{{ formatarVariacao(item.variacao) }}</td>
+              <td>
+                {{ item.custo | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+              </td>
+              <td>{{ item.saldoApos }} un.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <p class="me-vazio">Nenhuma movimentação encontrada para o período selecionado.</p>
+  }
+</app-card>

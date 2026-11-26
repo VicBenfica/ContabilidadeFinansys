@@ -7,16 +7,46 @@ import { Cadastro } from './pages/cadastro/cadastro';
 import { Home } from './pages/home/home';
 
 export const routes: Routes = [
-    { path: '', redirectTo: 'login', pathMatch: 'full' },
-    { path: 'login', component: Login },
-    { path: 'cadastro', component: Cadastro },
-
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: 'login', component: Login },
+  { path: 'cadastro', component: Cadastro },
     {
         path: '',
         component: AppLayout,
         children: [
             { path: 'home', component: Home },
             { path: 'empresas', component: Empresas },
+               {
+        path: 'plano-contas/nova',
+        loadComponent: () =>
+          import('./pages/nova-conta/nova-conta').then((m) => m.NovaConta),
+      },
+      {
+        path: 'plano-contas/editar/:codigo',
+        loadComponent: () =>
+          import('./pages/nova-conta/nova-conta').then((m) => m.NovaConta),
+      },
+      {
+        path: 'plano-contas/importar',
+        loadComponent: () =>
+          import('./pages/importar-plano/importar-plano').then(
+            (m) => m.ImportarPlano,
+          ),
+      },
+      {
+        path: 'plano-contas/balancete-inicial',
+        loadComponent: () =>
+          import('./pages/balancete-inicial/balancete-inicial').then(
+            (m) => m.BalanceteInicial,
+          ),
+      },
+      {
+        path: 'plano-contas',
+        loadComponent: () =>
+          import('./pages/plano-contas/plano-contas').then(
+            (m) => m.PlanoContas,
+          ),
+      },
             {
                 path: 'livro-razao/exportar',
                 loadComponent: () =>
@@ -53,7 +83,63 @@ export const routes: Routes = [
                 loadComponent: () =>
                     import('./pages/livro-diario/livro-diario').then((m) => m.LivroDiario),
             },
+              {
+        path: 'relatorios',
+        redirectTo: 'relatorios/balancete',
+        pathMatch: 'full',
+      },
+      {
+        path: 'relatorios/balancete',
+        loadComponent: () =>
+          import('./pages/balancete-verificacao/balancete-verificacao').then(
+            (m) => m.BalanceteVerificacao,
+          ),
+      },
+      {
+        path: 'relatorios/balanco-patrimonial',
+        loadComponent: () =>
+          import('./pages/balanco-patrimonial/balanco-patrimonial').then(
+            (m) => m.BalancoPatrimonial,
+          ),
+      },
+      {
+        path: 'relatorios/dre',
+        loadComponent: () =>
+          import('./pages/dre/dre').then((m) => m.Dre),
+      },
+      {
+        path: 'relatorios/dfc',
+        loadComponent: () =>
+          import('./pages/dfc/dfc').then((m) => m.Dfc),
+      },
+      {
+        path: 'estoque/compra',
+        loadComponent: () =>
+          import('./pages/registrar-compra/registrar-compra').then(
+            (m) => m.RegistrarCompra,
+          ),
+      },
+      {
+        path: 'estoque/venda',
+        loadComponent: () =>
+          import('./pages/registrar-venda/registrar-venda').then(
+            (m) => m.RegistrarVenda,
+          ),
+      },
+      {
+        path: 'estoque/movimentacoes',
+        loadComponent: () =>
+          import('./pages/movimentacoes-estoque/movimentacoes-estoque').then(
+            (m) => m.MovimentacoesEstoque,
+          ),
+      },
+      {
+        path: 'estoque',
+        loadComponent: () =>
+          import('./pages/estoque/estoque').then((m) => m.Estoque),
+      },
 
         ],
     },
+
 ];

@@ -1,0 +1,168 @@
+<header class="bv-cabecalho">
+  <div>
+    <small>FINANSYS / ESCRITURAÇÃO</small>
+    <h1>Balancete de verificação</h1>
+    <p>Resumo de saldos e movimentações por conta para conferir a escrituração.</p>
+  </div>
+
+  <div class="bv-acoes">
+    <button class="fs-botao bv-btn" type="button" (click)="gerarPdf()">
+      Gerar PDF
+    </button>
+
+    <button
+      class="fs-botao bv-btn"
+      type="button"
+      [disabled]="gerandoExcel"
+      (click)="exportarExcel()"
+    >
+      {{ gerandoExcel ? 'Exportando…' : 'Exportar Excel' }}
+    </button>
+  </div>
+</header>
+
+<nav class="bv-abas" aria-label="Relatórios contábeis">
+  <a
+    class="bv-aba"
+    routerLink="/relatorios/balancete"
+    routerLinkActive="bv-aba-ativa"
+  >
+    Balancete
+  </a>
+  <a
+    class="bv-aba"
+    routerLink="/relatorios/balanco-patrimonial"
+    routerLinkActive="bv-aba-ativa"
+  >
+    Balanço Patrimonial
+  </a>
+  <a
+    class="bv-aba"
+    routerLink="/relatorios/dre"
+    routerLinkActive="bv-aba-ativa"
+  >
+    DRE
+  </a>
+  <a
+    class="bv-aba"
+    routerLink="/relatorios/dfc"
+    routerLinkActive="bv-aba-ativa"
+  >
+    DFC
+  </a>
+</nav>
+
+<section class="bv-filtros-card" aria-label="Filtros do balancete de verificação">
+  <form class="bv-filtros" (ngSubmit)="aplicarFiltros()">
+    <label>
+      Data inicial
+      <input type="date" name="dataInicial" [(ngModel)]="filtros.dataInicial" />
+    </label>
+
+    <label>
+      Data final
+      <input type="date" name="dataFinal" [(ngModel)]="filtros.dataFinal" />
+    </label>
+
+    <label>
+      Contas
+      <select name="contas" [(ngModel)]="filtros.contas">
+        <option value="movimentacao">Com movimentação</option>
+        <option value="com-saldo">Com saldo final</option>
+        <option value="todas">Todas as contas</option>
+      </select>
+    </label>
+
+    <button class="fs-botao bv-filtrar" type="submit">Aplicar filtros</button>
+  </form>
+</section>
+
+@if (erroExportacao) {
+  <p class="bv-erro" role="alert">{{ erroExportacao }}</p>
+}
+
+<app-card [titulo]="tituloPeriodo()">
+  @let lista = linhasFiltradas();
+  @let resumo = totais();
+
+  @if (lista.length > 0) {
+    <div class="fs-table-wrap">
+      <table class="fs-table bv-tabela" aria-label="Tabela do balancete de verificação">
+        <thead>
+          <tr>
+            <th scope="col">Conta</th>
+            <th scope="col">Saldo anterior</th>
+            <th scope="col">Débitos</th>
+            <th scope="col">Créditos</th>
+            <th scope="col">Saldo final</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (item of lista; track item.codigo) {
+            <tr>
+              <td class="bv-conta">
+                <span class="bv-codigo">{{ item.codigo }}</span> · {{ item.nome }}
+              </td>
+
+              <td>
+                @if (item.saldoAnterior > 0) {
+                  {{ item.saldoAnterior | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+                } @else {
+                  <span class="bv-traco">—</span>
+                }
+              </td>
+
+              <td>
+                @if (item.debitos > 0) {
+                  {{ item.debitos | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+                } @else {
+                  <span class="bv-traco">—</span>
+                }
+              </td>
+
+              <td>
+                @if (item.creditos > 0) {
+                  {{ item.creditos | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+                } @else {
+                  <span class="bv-traco">—</span>
+                }
+              </td>
+
+              <td>
+                @if (item.saldoFinal > 0 && item.naturezaSaldo) {
+                  {{ item.saldoFinal | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+                  {{ item.naturezaSaldo }}
+                } @else {
+                  <span class="bv-traco">—</span>
+                }
+              </td>
+            </tr>
+          }
+
+          <tr class="bv-linha-total">
+            <td class="bv-conta-total">Total</td>
+            <td>
+              @if (resumo.saldoAnterior > 0) {
+                {{ resumo.saldoAnterior | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+              } @else {
+                <span class="bv-traco">—</span>
+              }
+            </td>
+            <td>
+              {{ resumo.debitos | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+            </td>
+            <td>
+              {{ resumo.creditos | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+            </td>
+            <td>
+              {{ resumo.diferenca | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <p class="bv-vazio">Nenhuma conta encontrada para os filtros selecionados.</p>
+  }
+</app-card>

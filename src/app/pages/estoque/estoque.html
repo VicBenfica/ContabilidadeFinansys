@@ -1,0 +1,139 @@
+<header class="est-cabecalho">
+  <div>
+    <small>FINANSYS / ESCRITURAÇÃO</small>
+    <h1>Estoque</h1>
+    <p>Controle de produtos, entradas, saídas e custo médio ponderado.</p>
+  </div>
+
+  <div class="est-acoes">
+    <a class="fs-botao est-btn-secundario" routerLink="/estoque/compra">
+      Registrar compra
+    </a>
+
+    <a class="fs-botao est-btn-primario" routerLink="/estoque/venda">
+      Registrar venda
+    </a>
+  </div>
+</header>
+
+<section class="est-resumo-cards" aria-label="Indicadores de estoque">
+  <article class="est-kpi-card">
+    <span class="est-kpi-label">Produtos cadastrados</span>
+    <strong class="est-kpi-valor">{{ produtosCadastrados() }}</strong>
+  </article>
+
+  <article class="est-kpi-card">
+    <span class="est-kpi-label">Unidades em estoque</span>
+    <strong class="est-kpi-valor">{{ unidadesEmEstoque() }}</strong>
+  </article>
+
+  <article class="est-kpi-card est-kpi-destaque">
+    <span class="est-kpi-label">Custo total em estoque</span>
+    <strong class="est-kpi-valor">
+      {{ custoTotalEstoque() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+    </strong>
+  </article>
+</section>
+
+<section class="est-secao-card" aria-labelledby="est-titulo-produtos">
+  <div class="est-secao-topo">
+    <h2 id="est-titulo-produtos">Produtos</h2>
+    <p>Consulte o saldo por produto e cadastre novas mercadorias.</p>
+  </div>
+
+  <div class="est-secao-acoes">
+    <a class="fs-botao est-btn-secundario" routerLink="/estoque/novo">
+      + Novo produto
+    </a>
+
+    <a class="fs-botao est-btn-secundario" routerLink="/estoque/movimentacoes">
+      Ver movimentações
+    </a>
+  </div>
+
+  @if (produtos().length > 0) {
+    <div class="fs-table-wrap">
+      <table class="fs-table est-tabela" aria-label="Tabela de produtos em estoque">
+        <thead>
+          <tr>
+            <th scope="col">Produto</th>
+            <th scope="col">Quantidade</th>
+            <th scope="col">Custo unitário médio</th>
+            <th scope="col">Custo total</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (item of produtos(); track item.id) {
+            <tr>
+              <td class="est-destaque-roxo">{{ item.nome }}</td>
+              <td>{{ item.quantidade }} un.</td>
+              <td>
+                {{ item.custoUnitarioMedio | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+              </td>
+              <td>
+                {{ custoTotalProduto(item) | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <p class="est-vazio">Nenhum produto cadastrado no estoque.</p>
+  }
+</section>
+
+<section
+  class="est-secao-card"
+  aria-labelledby="est-titulo-movimentacoes"
+>
+  <div class="est-secao-topo">
+    <h2 id="est-titulo-movimentacoes">Movimentações recentes</h2>
+    <p>Entradas e saídas estão vinculadas aos respectivos lançamentos.</p>
+  </div>
+
+  @if (movimentacoes().length > 0) {
+    <div class="fs-table-wrap">
+      <table
+        class="fs-table est-tabela"
+        aria-label="Tabela de movimentações recentes do estoque"
+      >
+        <thead>
+          <tr>
+            <th scope="col">Nº</th>
+            <th scope="col">Data</th>
+            <th scope="col">Produto</th>
+            <th scope="col">Movimento</th>
+            <th scope="col">Quantidade</th>
+            <th scope="col">Custo</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (mov of movimentacoes(); track mov.numeroLancamento) {
+            <tr>
+              <td>
+                <a
+                  class="est-link-lancamento"
+                  [routerLink]="['/livro-diario/lancamentos', mov.numeroLancamento]"
+                >
+                  #{{ mov.numeroLancamento }}
+                </a>
+              </td>
+              <td>{{ mov.data }}</td>
+              <td>{{ mov.produto }}</td>
+              <td>{{ mov.descricaoMovimento }}</td>
+              <td>{{ formatarQuantidadeMovimento(mov.quantidade) }}</td>
+              <td>
+                {{ mov.custo | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <p class="est-vazio">Nenhuma movimentação registrada no período.</p>
+  }
+</section>

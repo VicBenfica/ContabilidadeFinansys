@@ -1,0 +1,173 @@
+<header class="rv-cabecalho">
+  <small>FINANSYS / ESCRITURAÇÃO</small>
+  <h1>Registrar venda</h1>
+  <p>Contabilize a receita, o custo e a baixa do estoque em um só lançamento.</p>
+</header>
+
+<form class="rv-formulario" (ngSubmit)="contabilizarVenda()">
+  <section class="rv-card" aria-labelledby="rv-etapa-1">
+    <h2 id="rv-etapa-1">1. Dados da operação</h2>
+    <p class="rv-subtitulo">O custo é calculado pelo custo médio do estoque.</p>
+
+    <div class="rv-grid-dados">
+      <label>
+        Data
+        <input
+          type="date"
+          name="data"
+          [ngModel]="data()"
+          (ngModelChange)="data.set($event)"
+          required
+        />
+      </label>
+
+      <label>
+        Produto
+        <select
+          name="produtoId"
+          [ngModel]="produtoId()"
+          (ngModelChange)="produtoId.set($event)"
+          required
+        >
+          @for (prod of produtos(); track prod.id) {
+            <option [value]="prod.id">{{ prod.nome }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Quantidade
+        <input
+          type="number"
+          name="quantidade"
+          min="1"
+          step="1"
+          [ngModel]="quantidade()"
+          (ngModelChange)="quantidade.set(+$event)"
+          required
+        />
+      </label>
+
+      <label>
+        Histórico
+        <input
+          type="text"
+          name="historico"
+          [ngModel]="historico()"
+          (ngModelChange)="historico.set($event)"
+          placeholder="Ex.: Venda de 4 cadernos"
+          required
+        />
+      </label>
+    </div>
+  </section>
+
+  <section class="rv-card" aria-labelledby="rv-etapa-2">
+    <h2 id="rv-etapa-2">2. Distribuição do valor</h2>
+    <p class="rv-subtitulo">
+      Separe a parte à vista e a vencer no curto e no longo prazo conforme os vencimentos.
+    </p>
+
+    <div class="rv-grid-valores">
+      <label>
+        Valor total
+        <div class="rv-moeda-campo">
+          <span>R$</span>
+          <input
+            type="number"
+            name="valorTotal"
+            min="0"
+            step="0.01"
+            [ngModel]="valorTotal()"
+            (ngModelChange)="aoAlterarValorTotal($event)"
+            required
+          />
+        </div>
+      </label>
+
+      <label>
+        À vista
+        <div class="rv-moeda-campo">
+          <span>R$</span>
+          <input
+            type="number"
+            name="valorAVista"
+            min="0"
+            step="0.01"
+            [ngModel]="valorAVista()"
+            (ngModelChange)="valorAVista.set(+$event || 0)"
+          />
+        </div>
+      </label>
+
+      <label>
+        Curto prazo
+        <div class="rv-moeda-campo">
+          <span>R$</span>
+          <input
+            type="number"
+            name="valorCurtoPrazo"
+            min="0"
+            step="0.01"
+            [ngModel]="valorCurtoPrazo()"
+            (ngModelChange)="valorCurtoPrazo.set(+$event || 0)"
+          />
+        </div>
+      </label>
+
+      <label>
+        Longo prazo
+        <div class="rv-moeda-campo">
+          <span>R$</span>
+          <input
+            type="number"
+            name="valorLongoPrazo"
+            min="0"
+            step="0.01"
+            [ngModel]="valorLongoPrazo()"
+            (ngModelChange)="valorLongoPrazo.set(+$event || 0)"
+          />
+        </div>
+      </label>
+    </div>
+  </section>
+
+  <section class="rv-card" aria-labelledby="rv-etapa-3">
+    <h2 id="rv-etapa-3">3. Prévia da contabilização</h2>
+    <p class="rv-subtitulo">
+      Débitos: Caixa, Clientes e CMV. Créditos: Receita de vendas e Estoque.
+    </p>
+
+    <div
+      class="rv-previa-banner"
+      [class.rv-previa-alerta]="!partidasFechadas() || !saldoSuficiente()"
+      role="status"
+    >
+      @if (!saldoSuficiente()) {
+        Estoque insuficiente: saldo disponível de
+        {{ produtoSelecionado()?.saldoDisponivel ?? 0 }} un.
+      } @else if (!partidasFechadas()) {
+        Diferença na distribuição: total
+        {{ valorTotal() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }} e distribuído
+        {{ somaDistribuicao() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+      } @else {
+        Débitos e créditos
+        {{ totalPartidas() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }} cada ·
+        Saída de {{ quantidade() }} {{ quantidade() === 1 ? 'unidade' : 'unidades' }} ·
+        CMV de {{ cmvCalculado() | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+      }
+    </div>
+  </section>
+
+  @if (erroValidacao) {
+    <p class="rv-erro" role="alert">{{ erroValidacao }}</p>
+  }
+
+  <div class="rv-rodape-acoes">
+    <a class="fs-botao rv-btn-cancelar" routerLink="/estoque">Cancelar</a>
+
+    <button class="fs-botao rv-btn-confirmar" type="submit">
+      Contabilizar venda
+    </button>
+  </div>
+</form>

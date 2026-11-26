@@ -1,3 +1,4 @@
+
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -9,9 +10,11 @@ import {
   ExportacaoService,
   type DocumentoExportacao,
 } from '../../shared/services/exportacao.service';
+import { PlanoContasService } from '../../shared/services/plano-contas.service';
 
 @Component({
   selector: 'app-exportacoes',
+  standalone: true,
   imports: [Card, FormsModule, RouterLink],
   templateUrl: './exportacoes.html',
   styleUrl: './exportacoes.css',
@@ -19,12 +22,16 @@ import {
 export class Exportacoes {
   private readonly rota = inject(ActivatedRoute);
   private readonly exportacao = inject(ExportacaoService);
+  private readonly planoService = inject(PlanoContasService);
 
   readonly empresa = inject(EmpresasService).selecionada;
 
   private readonly parametros = toSignal(this.rota.queryParamMap, {
     initialValue: this.rota.snapshot.queryParamMap,
   });
+
+  mes = '2026-11';
+
   formato: 'pdf' | 'xlsx' =
     this.parametros().get('formato') === 'xlsx' ? 'xlsx' : 'pdf';
 
@@ -36,56 +43,16 @@ export class Exportacoes {
     currency: 'BRL',
   });
 
-  formatarCelula(valor: string | number): string {
-    return typeof valor === 'number' ? this.moeda.format(valor) : valor;
-  }
-
-  async gerarArquivo(): Promise<void> {
-    const relatorio = this.documento;
-    const empresa = this.empresa();
-
-    if (!empresa || !relatorio?.linhas.length || this.gerando) return;
-
-    this.erroExportacao = '';
-
-    if (this.formato === 'pdf') {
-      window.print();
-      return;
-    }
-
-    this.gerando = true;
-
-    try {
-      await this.exportacao.baixarExcel(
-        relatorio,
-        empresa.nomeFantasia,
-        this.periodoExibido,
-        this.modoRazao
-          ? {
-            nomeArquivo: `livro-razao-${this.inicioRazao}-a-${this.fimRazao}.xlsx`,
-            larguras: [10, 14, 48, 16, 16, 20],
-            colunasMonetarias: [4, 5, 6],
-          }
-          : undefined,
-      );
-    } catch {
-      this.erroExportacao = 'Não foi possível gerar o Excel. Tente novamente.';
-    } finally {
-      this.gerando = false;
-    }
-  }
-  mes = '2026-11';
-
   get tipo(): string {
     return this.parametros().get('tipo') ?? 'consolidado';
   }
 
-  get consolidado(): boolean {
-    return this.tipo !== 'diario' && this.tipo !== 'razao';
-  }
-
   get modoRazao(): boolean {
     return this.tipo === 'razao';
+  }
+
+  get consolidado(): boolean {
+    return this.tipo !== 'diario' && !this.modoRazao;
   }
 
   get inicioRazao(): string {
@@ -117,8 +84,13 @@ export class Exportacoes {
   }
 
   get periodoExibido(): string {
-    if (!this.modoRazao) return this.mes;
-    if (!this.inicioRazao || !this.fimRazao) return 'Período não informado';
+    if (!this.modoRazao) {
+      return this.mes;
+    }
+
+    if (!this.inicioRazao || !this.fimRazao) {
+      return 'Período não informado';
+    }
 
     const inicio = this.inicioRazao.split('-').reverse().join('/');
     const fim = this.fimRazao.split('-').reverse().join('/');
@@ -127,17 +99,109 @@ export class Exportacoes {
   }
 
   get documento(): DocumentoExportacao | null {
-    if (this.modoRazao) return this.razaoExportado?.documento ?? null;
-
     const empresa = this.empresa();
-    if (!empresa || !this.mes || this.consolidado) return null;
 
-    return this.exportacao.gerarDiario(empresa.id, this.mes);
+    if (!empresa) {
+      return null;
+    }
+
+    if (this.modoRazao) {
+      return this.razaoExportado?.documento ?? null;
+    }
+
+    if (!this.mes) {
+      return null;
+    }
+
+    if (this.tipo === 'diario') {
+      return this.exportacao.gerarDiario(
+        empresa.id,
+        this.mes,
+      );
+    }
+
+    const diario = this.exportacao.gerarDiario(
+      empresa.id,
+      this.mes,
+    );
+
+    if (diario.linhas.length > 0) {
+      return {
+        ...diario,
+        titulo:
+          'Relatório Contábil Consolidado (Diário, Razão, Balancete, Balanço, DRE e DFC)',
+      };
+    }
+
+    return {
+      titulo:
+        'Relatório Contábil Consolidado (Diário, Razão, Balancete, Balanço, DRE e DFC)',
+      colunas: [
+        'Código',
+        'Conta contábil',
+        'Grupo',
+        'Subgrupo',
+        'Tipo',
+      ],
+      linhas: this.planoService.contas().map((conta) => [
+        conta.codigo,
+        conta.nome,
+        conta.grupo,
+        conta.subgrupo,
+        conta.tipo,
+      ]),
+    };
   }
 
-  imprimir(): void {
-    if (this.documento?.linhas.length) {
+  formatarCelula(valor: string | number): string {
+    return typeof valor === 'number'
+      ? this.moeda.format(valor)
+      : valor;
+  }
+
+  async gerarArquivo(): Promise<void> {
+    const relatorio = this.documento;
+    const empresa = this.empresa();
+
+    if (
+      !empresa ||
+      !relatorio ||
+      relatorio.linhas.length === 0 ||
+      this.gerando
+    ) {
+      return;
+    }
+
+    this.erroExportacao = '';
+
+    if (this.consolidado || this.formato === 'pdf') {
       window.print();
+      return;
+    }
+
+    this.gerando = true;
+
+    try {
+      await this.exportacao.baixarExcel(
+        relatorio,
+        empresa.nomeFantasia,
+        this.periodoExibido,
+        this.modoRazao
+          ? {
+              nomeArquivo:
+                `livro-razao-${this.inicioRazao}-a-${this.fimRazao}.xlsx`,
+              larguras: [10, 14, 48, 16, 16, 20],
+              colunasMonetarias: [4, 5, 6],
+            }
+          : undefined,
+      );
+    } catch (erro) {
+      console.error(erro);
+
+      this.erroExportacao =
+        'Não foi possível gerar o Excel. Tente novamente.';
+    } finally {
+      this.gerando = false;
     }
   }
 }
