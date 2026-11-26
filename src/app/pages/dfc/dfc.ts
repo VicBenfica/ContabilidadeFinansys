@@ -8,6 +8,7 @@ import {
   ExportacaoService,
   type DocumentoExportacao,
 } from '../../shared/services/exportacao.service';
+import { ArquivoProntoService } from '../../shared/services/arquivo-pronto.service';
 
 export interface LinhaMovimentoCaixa {
   id: string;
@@ -58,6 +59,7 @@ const MOVIMENTOS_INICIAIS: LinhaMovimentoCaixa[] = [
 })
 export class Dfc {
   private readonly exportacao = inject(ExportacaoService);
+  private readonly arquivoPronto = inject(ArquivoProntoService);
   readonly empresa = inject(EmpresasService).selecionada;
 
   filtros = {
@@ -110,6 +112,11 @@ export class Dfc {
 
     try {
       await this.exportacao.baixarExcel(documento, nomeEmpresa, periodo);
+      await this.arquivoPronto.abrir(
+        'Demonstração dos Fluxos de Caixa (DFC)',
+        'Excel (.xlsx)',
+        '/relatorios/dfc',
+      );
     } catch {
       this.erroExportacao = 'Não foi possível gerar o Excel. Tente novamente.';
     } finally {

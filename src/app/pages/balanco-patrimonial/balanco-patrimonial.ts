@@ -8,6 +8,7 @@ import {
   ExportacaoService,
   type DocumentoExportacao,
 } from '../../shared/services/exportacao.service';
+import { ArquivoProntoService } from '../../shared/services/arquivo-pronto.service';
 
 export interface LinhaGrupoPatrimonial {
   grupo: string;
@@ -25,7 +26,7 @@ export interface LinhaGrupoPatrimonial {
 export class BalancoPatrimonial {
   private readonly exportacao = inject(ExportacaoService);
   readonly empresa = inject(EmpresasService).selecionada;
-
+  private readonly arquivoPronto = inject(ArquivoProntoService);
   dataReferencia = '2026-11-30';
   readonly dataAplicada = signal(this.dataReferencia);
 
@@ -103,6 +104,11 @@ export class BalancoPatrimonial {
 
     try {
       await this.exportacao.baixarExcel(documento, nomeEmpresa, periodo);
+      await this.arquivoPronto.abrir(
+        'Balanço Patrimonial',
+        'Excel (.xlsx)',
+        '/relatorios/balanco-patrimonial',
+      );
     } catch {
       this.erroExportacao = 'Não foi possível gerar o Excel. Tente novamente.';
     } finally {
