@@ -3,7 +3,7 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-
+import { ArquivoProntoService } from '../../shared/services/arquivo-pronto.service';
 import { Card } from '../../shared/components/card/card';
 import { EmpresasService } from '../../shared/services/empresas.service';
 import {
@@ -23,7 +23,7 @@ export class Exportacoes {
   private readonly rota = inject(ActivatedRoute);
   private readonly exportacao = inject(ExportacaoService);
   private readonly planoService = inject(PlanoContasService);
-
+  private readonly arquivoPronto = inject(ArquivoProntoService);
   readonly empresa = inject(EmpresasService).selecionada;
 
   private readonly parametros = toSignal(this.rota.queryParamMap, {
@@ -56,6 +56,21 @@ export class Exportacoes {
   }
   get modoPlanoContas(): boolean {
     return this.tipo === 'plano-contas';
+  }
+  get nomeRelatorio(): string {
+    if (this.modoPlanoContas) return 'Plano de Contas';
+    if (this.modoRazao) return 'Livro Razão';
+    if (this.tipo === 'diario') return 'Livro Diário';
+
+    return 'Relatório Contábil Consolidado';
+  }
+
+  get origemExportacao(): string {
+    if (this.modoPlanoContas) return '/plano-contas';
+    if (this.modoRazao) return '/livro-razao';
+    if (this.tipo === 'diario') return '/livro-diario';
+
+    return '/home';
   }
   get inicioRazao(): string {
     return this.parametros().get('inicio') ?? '';
@@ -166,47 +181,72 @@ export class Exportacoes {
       ]),
     };
   }
-  gerarCSV(): void {
+
+  async gerarCSV(): Promise<void> {
     const relatorio = this.documento;
     const empresa = this.empresa();
 
-    if (!empresa || !relatorio?.linhas.length) return;
+    if (!empresa || !relatorio?.linhas.length || this.gerando) {
+      return;
+    }
 
-    const escapar = (valor: string | number): string => {
-      let texto = String(valor ?? '');
+    this.gerando = true;
+    this.erroExportacao = '';
 
-      if (/^\s*[=+\-@\t\r]/.test(texto)) {
-        texto = "'" + texto;
+    try {
+      const escapar = (valor: string | number): string => {
+        let texto = String(valor ?? '');
+
+        if (/^\s*[=+\-@\t\r]/.test(texto)) {
+          texto = "'" + texto;
+        }
+
+        return `"${texto.replace(/"/g, '""')}"`;
+      };
+
+      const linhas = [
+        relatorio.colunas,
+        ...relatorio.linhas,
+      ];
+
+      const csv = '\uFEFF' + linhas
+        .map((linha) => linha.map(escapar).join(';'))
+        .join('\r\n');
+
+      const blob = new Blob([csv], {
+        type: 'text/csv;charset=utf-8;',
+      });
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+
+      try {
+        link.href = url;
+        link.download = `plano-de-contas-${empresa.id}.csv`;
+
+        document.body.appendChild(link);
+        link.click();
+
+      } finally {
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
       }
 
-      return `"${texto.replace(/"/g, '""')}"`;
-    };
+      await this.arquivoPronto.abrir(
+        'Plano de Contas',
+        'CSV',
+        '/plano-contas',
+      );
 
-    const linhas = [
-      relatorio.colunas,
-      ...relatorio.linhas,
-    ];
-
-    const csv = '\uFEFF' + linhas
-      .map((linha) => linha.map(escapar).join(';'))
-      .join('\r\n');
-
-    const blob = new Blob([csv], {
-      type: 'text/csv;charset=utf-8;',
-    });
-
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-
-    link.href = url;
-    link.download = `plano-de-contas-${empresa.id}.csv`;
-
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (erro) {
+      console.error(erro);
+      this.erroExportacao =
+        'Não foi possível gerar o arquivo CSV.';
+    } finally {
+      this.gerando = false;
+    }
   }
+
   formatarCelula(valor: string | number): string {
     return typeof valor === 'number'
       ? this.moeda.format(valor)
@@ -226,7 +266,7 @@ export class Exportacoes {
       return;
     }
     if (this.modoPlanoContas) {
-      this.gerarCSV();
+      await this.gerarCSV();
       return;
     }
     this.erroExportacao = '';
@@ -251,6 +291,11 @@ export class Exportacoes {
             colunasMonetarias: [4, 5, 6],
           }
           : undefined,
+      );
+      await this.arquivoPronto.abrir(
+        this.nomeRelatorio,
+        'Excel (.xlsx)',
+        this.origemExportacao,
       );
     } catch (erro) {
       console.error(erro);

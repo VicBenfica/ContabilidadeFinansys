@@ -1,0 +1,49 @@
+
+<div class="ap-pagina">
+
+  <header class="ap-cabecalho">
+    <small>FINANSYS / RELATÓRIOS</small>
+
+    <h1>Arquivo pronto</h1>
+
+    <p>
+      Confira o resultado da exportação do relatório contábil.
+    </p>
+  </header>
+
+  @if (concluido) {
+    <app-card
+      titulo="Exportação concluída"
+      descricao="O arquivo foi gerado e o download foi iniciado."
+    >
+      <p class="ap-detalhes">
+        {{ relatorio }} · {{ formato }}
+      </p>
+
+      <div class="ap-acoes">
+        <a
+          class="ap-botao ap-primario"
+          routerLink="/home"
+        >
+          Voltar ao início
+        </a>
+
+      </div>
+    </app-card>
+  } @else {
+    <app-card
+      titulo="Nenhuma exportação confirmada"
+      descricao="Para gerar um arquivo, acesse um relatório e escolha a opção de exportação."
+    >
+      <div class="ap-acoes">
+        <a
+          class="ap-botao ap-primario"
+          routerLink="/relatorios/balancete"
+        >
+          Ver relatórios
+        </a>
+      </div>
+    </app-card>
+  }
+
+</div>

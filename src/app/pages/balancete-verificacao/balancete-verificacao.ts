@@ -1,13 +1,14 @@
 import { CurrencyPipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Card } from '../../shared/components/card/card';
 import { EmpresasService } from '../../shared/services/empresas.service';
 import {
   ExportacaoService,
   type DocumentoExportacao,
 } from '../../shared/services/exportacao.service';
+import { ArquivoProntoService } from '../../shared/services/arquivo-pronto.service';
 
 export interface LinhaBalanceteVerificacao {
   codigo: string;
@@ -103,6 +104,8 @@ const MOVIMENTACOES_INICIAIS: LinhaBalanceteVerificacao[] = [
 })
 export class BalanceteVerificacao {
   private readonly exportacao = inject(ExportacaoService);
+  private readonly router = inject(Router);
+  private readonly arquivoPronto = inject(ArquivoProntoService);
   readonly empresa = inject(EmpresasService).selecionada;
 
   filtros = {
@@ -197,9 +200,22 @@ export class BalanceteVerificacao {
     };
 
     try {
-      await this.exportacao.baixarExcel(documento, nomeEmpresa, periodo);
-    } catch {
-      this.erroExportacao = 'Não foi possível gerar o Excel. Tente novamente.';
+      await this.exportacao.baixarExcel(
+        documento,
+        nomeEmpresa,
+        periodo
+      );
+
+      await this.arquivoPronto.abrir(
+        'Balancete de Verificação',
+        'Excel (.xlsx)',
+        '/relatorios/balancete',
+      );
+
+    } catch (erro) {
+      console.error(erro);
+      this.erroExportacao =
+        'Não foi possível gerar o Excel. Tente novamente.';
     } finally {
       this.gerandoExcel = false;
     }
