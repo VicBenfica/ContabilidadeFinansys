@@ -3,6 +3,7 @@
 <div class="exp-tela">
   <header class="exp-cabecalho">
     <small>FINANSYS / ESCRITURAÇÃO</small>
+
     <h1>
       {{
         modoPlanoContas
@@ -13,11 +14,16 @@
               ? 'Exportar Balancete'
               : modoBalancoPatrimonial
                 ? 'Exportar Balanço Patrimonial'
-                : consolidado
-                  ? 'Exportações da empresa'
-                  : 'Exportar Livro Diário'
+                : modoDre
+                  ? 'Exportar DRE'
+                  : modoDfc
+                    ? 'Exportar DFC'
+                    : consolidado
+                      ? 'Exportações da empresa'
+                      : 'Exportar Livro Diário'
       }}
     </h1>
+
     <p>Confira o escopo e o formato do documento antes da exportação.</p>
   </header>
 
@@ -29,12 +35,16 @@
         : modoRazao
           ? 'Livro Razão · ' + (razaoExportado?.conta ?? 'Conta não disponível')
           : modoBalancete
-            ? 'Balancete de verificação · saldos e movimentações'
+            ? 'Balancete de verificação · saldos e movimentações.'
             : modoBalancoPatrimonial
-              ? 'Balanço Patrimonial · posição acumulada'
-              : consolidado
-                ? 'PDF consolidado · Diário, Razão, Balancete, Balanço, DRE e DFC'
-                : 'Resumo dos lançamentos do Livro Diário no período selecionado.'
+              ? 'Balanço Patrimonial · posição acumulada.'
+              : modoDre
+                ? 'DRE · Demonstração do Resultado do Exercício.'
+                : modoDfc
+                  ? 'DFC · Demonstração dos Fluxos de Caixa.'
+                  : consolidado
+                    ? 'PDF consolidado · Diário, Razão, Balancete, Balanço, DRE e DFC.'
+                    : 'Resumo dos lançamentos do Livro Diário no período selecionado.'
     "
   >
     <form (ngSubmit)="gerarArquivo()">
@@ -52,7 +62,7 @@
           <label>
             Período
 
-            @if (modoRazao) {
+            @if (modoRazao || modoBalancete || modoDre || modoDfc) {
               <input type="text" [value]="periodoExibido" readonly />
             } @else {
               <input type="month" name="mes" [(ngModel)]="mes" required />
@@ -88,9 +98,13 @@
                   ? '/relatorios/balancete'
                   : modoBalancoPatrimonial
                     ? '/relatorios/balanco-patrimonial'
-                    : consolidado
-                      ? '/home'
-                      : '/livro-diario'
+                    : modoDre
+                      ? '/relatorios/dre'
+                      : modoDfc
+                        ? '/relatorios/dfc'
+                        : consolidado
+                          ? '/home'
+                          : '/livro-diario'
           "
         >
           Voltar
@@ -119,14 +133,18 @@
         </p>
       }
 
-      @if (modoRazao && !relatorio) {
+      @if (
+        (modoRazao || modoBalancete || modoDre || modoDfc) && !relatorio
+      ) {
         <p class="exp-nota">
-          Não foi possível carregar o Livro Razão.
-          Volte à consulta e aplique os filtros da empresa selecionada.
+          Não foi possível carregar os dados da exportação.
+          Volte ao relatório e aplique os filtros novamente.
         </p>
-      } @else if (!consolidado && relatorio && relatorio.linhas.length === 0) {
+      } @else if (
+        !consolidado && relatorio && relatorio.linhas.length === 0
+      ) {
         <p class="exp-nota">
-          Nenhum lançamento encontrado nesse período.
+          Nenhum registro encontrado para exportação.
         </p>
       }
     </form>
@@ -137,7 +155,11 @@
   <section class="exp-impressao">
     <h1>{{ relatorio.titulo }}</h1>
 
-    <p>{{ empresa()?.nomeFantasia }} · Período: {{ periodoExibido }}</p>
+    <p>Empresa: {{ empresa()?.nomeFantasia }}</p>
+
+    @if (!modoPlanoContas) {
+      <p>Período: {{ periodoExibido }}</p>
+    }
 
     @if (modoRazao) {
       <p>Conta contábil: {{ razaoExportado?.conta }}</p>

@@ -119,13 +119,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/exportacoes/exportacoes').then((m) => m.Exportacoes),
       },
-
-      // RELATÓRIOS
       {
-        path: 'relatorios/balancete/exportar',
+        path: 'relatorios/dre/exportar',
         loadComponent: () =>
           import('./pages/exportacoes/exportacoes').then((m) => m.Exportacoes),
       },
+
+      // RELATÓRIOS
       {
         path: 'relatorios',
         redirectTo: 'relatorios/balancete',
@@ -137,6 +137,11 @@ export const routes: Routes = [
           import('./pages/arquivo-pronto/arquivo-pronto').then(
             (m) => m.ArquivoPronto,
           ),
+      },
+      {
+        path: 'relatorios/balancete/exportar',
+        loadComponent: () =>
+          import('./pages/exportacoes/exportacoes').then((m) => m.Exportacoes),
       },
       {
         path: 'relatorios/balancete',

@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { LancamentosService } from './lancamentos.service';
 import { montarRazao } from '../utils/livro-razao';
 import { signal } from '@angular/core';
+
 export interface DocumentoExportacao {
     titulo: string;
     colunas: string[];
@@ -41,6 +42,53 @@ export class ExportacaoService {
                 ]),
             ),
         };
+    }
+    private readonly drePreparada = signal<{
+        empresaId: number;
+        periodo: string;
+        documento: DocumentoExportacao;
+    } | null>(null);
+
+    prepararDre(
+        empresaId: number,
+        periodo: string,
+        documento: DocumentoExportacao,
+    ): void {
+        this.drePreparada.set({
+            empresaId,
+            periodo,
+            documento,
+        });
+    }
+
+    private readonly balancetePreparado = signal<{
+        empresaId: number;
+        periodo: string;
+        documento: DocumentoExportacao;
+    } | null>(null);
+
+    prepararBalancete(
+        empresaId: number,
+        periodo: string,
+        documento: DocumentoExportacao,
+    ): void {
+        this.balancetePreparado.set({
+            empresaId,
+            periodo,
+            documento,
+        });
+    }
+
+    obterBalancete(empresaId: number) {
+        const dados = this.balancetePreparado();
+
+        return dados?.empresaId === empresaId ? dados : null;
+    }
+
+    obterDre(empresaId: number) {
+        const dados = this.drePreparada();
+
+        return dados?.empresaId === empresaId ? dados : null;
     }
     gerarRazao(
         empresaId: number,

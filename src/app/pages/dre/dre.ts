@@ -1,14 +1,14 @@
+
 import { CurrencyPipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { Card } from '../../shared/components/card/card';
 import { EmpresasService } from '../../shared/services/empresas.service';
 import {
   ExportacaoService,
   type DocumentoExportacao,
 } from '../../shared/services/exportacao.service';
-import { ArquivoProntoService } from '../../shared/services/arquivo-pronto.service';
 
 export interface LinhaComposicaoResultado {
   contaGrupo: string;
@@ -26,8 +26,10 @@ export interface LinhaComposicaoResultado {
 })
 export class Dre {
   private readonly exportacao = inject(ExportacaoService);
+  private readonly router = inject(Router);
+
   readonly empresa = inject(EmpresasService).selecionada;
-  private readonly arquivoPronto = inject(ArquivoProntoService);
+
   filtros = {
     dataInicial: '2026-11-01',
     dataFinal: '2026-11-30',
@@ -42,7 +44,9 @@ export class Dre {
   readonly cmv = signal(40);
   readonly despesasOperacionais = signal(25);
 
-  readonly resultadoBruto = computed(() => this.receitaVendas() - this.cmv());
+  readonly resultadoBruto = computed(
+    () => this.receitaVendas() - this.cmv(),
+  );
 
   readonly lucroPeriodo = computed(
     () => this.resultadoBruto() - this.despesasOperacionais(),
@@ -79,24 +83,24 @@ export class Dre {
   ]);
 
   aplicarFiltros(): void {
+    if (
+      !this.filtros.dataInicial ||
+      !this.filtros.dataFinal ||
+      this.filtros.dataInicial > this.filtros.dataFinal
+    ) {
+      this.erroExportacao = 'Informe um período válido.';
+      return;
+    }
+
+    this.erroExportacao = '';
     this.filtrosAplicados.set({ ...this.filtros });
   }
 
-  gerarPdf(): void {
-    window.print();
-  }
+  private montarDocumento(): DocumentoExportacao {
+    const filtros = this.filtrosAplicados();
 
-  async exportarExcel(): Promise<void> {
-    if (this.gerandoExcel) return;
-
-    this.erroExportacao = '';
-    this.gerandoExcel = true;
-
-    const nomeEmpresa = this.empresa()?.nomeFantasia ?? 'Papelaria Aurora';
-    const periodo = this.filtrosAplicados().dataInicial.slice(0, 7) || '2026-11';
-
-    const documento: DocumentoExportacao = {
-      titulo: `DRE - ${this.filtrosAplicados().dataInicial} a ${this.filtrosAplicados().dataFinal}`,
+    return {
+      titulo: `DRE - ${filtros.dataInicial} a ${filtros.dataFinal}`,
       colunas: ['Conta / grupo', 'Descrição', 'Total'],
       linhas: this.composicaoResultado().map((item) => [
         item.contaGrupo,
@@ -104,18 +108,62 @@ export class Dre {
         item.redutora ? -item.total : item.total,
       ]),
     };
+  }
 
-    try {
-      await this.exportacao.baixarExcel(documento, nomeEmpresa, periodo);
-      await this.arquivoPronto.abrir(
-        'Demonstração do Resultado do Exercício (DRE)',
-        'Excel (.xlsx)',
-        '/relatorios/dre',
-      );
-    } catch {
-      this.erroExportacao = 'Não foi possível gerar o Excel. Tente novamente.';
-    } finally {
-      this.gerandoExcel = false;
+  private periodoExportacao(): string {
+    const filtros = this.filtrosAplicados();
+
+    return `${filtros.dataInicial} a ${filtros.dataFinal}`;
+  }
+
+  async abrirExportacao(
+    formato: 'pdf' | 'xlsx',
+  ): Promise<void> {
+    const empresa = this.empresa();
+
+    if (!empresa) {
+      this.erroExportacao = 'Selecione uma empresa antes de exportar.';
+      return;
     }
+
+    const filtros = this.filtrosAplicados();
+
+    if (
+      !filtros.dataInicial ||
+      !filtros.dataFinal ||
+      filtros.dataInicial > filtros.dataFinal
+    ) {
+      this.erroExportacao = 'Informe um período válido.';
+      return;
+    }
+
+    const documento = this.montarDocumento();
+    const periodo = this.periodoExportacao();
+
+    this.erroExportacao = '';
+
+    this.exportacao.prepararDre(
+      empresa.id,
+      periodo,
+      documento,
+    );
+
+    await this.router.navigate(
+      ['/relatorios/dre/exportar'],
+      {
+        queryParams: {
+          tipo: 'dre',
+          formato,
+        },
+      },
+    );
+  }
+
+  gerarPdf(): void {
+    void this.abrirExportacao('pdf');
+  }
+
+  exportarExcel(): void {
+    void this.abrirExportacao('xlsx');
   }
 }

@@ -8,7 +8,6 @@ import {
   ExportacaoService,
   type DocumentoExportacao,
 } from '../../shared/services/exportacao.service';
-import { ArquivoProntoService } from '../../shared/services/arquivo-pronto.service';
 
 export interface LinhaBalanceteVerificacao {
   codigo: string;
@@ -105,7 +104,6 @@ const MOVIMENTACOES_INICIAIS: LinhaBalanceteVerificacao[] = [
 export class BalanceteVerificacao {
   private readonly exportacao = inject(ExportacaoService);
   private readonly router = inject(Router);
-  private readonly arquivoPronto = inject(ArquivoProntoService);
   readonly empresa = inject(EmpresasService).selecionada;
 
   filtros = {
@@ -162,23 +160,19 @@ export class BalanceteVerificacao {
     this.filtrosAplicados.set({ ...this.filtros });
   }
 
-  gerarPdf(): void {
-    window.print();
-  }
 
-  async exportarExcel(): Promise<void> {
-    if (this.gerandoExcel) return;
-
-    this.erroExportacao = '';
-    this.gerandoExcel = true;
-
-    const nomeEmpresa = this.empresa()?.nomeFantasia ?? 'Papelaria Aurora';
-    const periodo = this.filtrosAplicados().dataInicial.slice(0, 7) || '2026-11';
+  private montarDocumento(): DocumentoExportacao {
     const totais = this.totais();
 
-    const documento: DocumentoExportacao = {
+    return {
       titulo: this.tituloPeriodo(),
-      colunas: ['Conta', 'Saldo anterior', 'Débitos', 'Créditos', 'Saldo final'],
+      colunas: [
+        'Conta',
+        'Saldo anterior',
+        'Débitos',
+        'Créditos',
+        'Saldo final',
+      ],
       linhas: [
         ...this.linhasFiltradas().map((item) => [
           `${item.codigo} · ${item.nome}`,
@@ -187,7 +181,7 @@ export class BalanceteVerificacao {
           item.creditos,
           item.saldoFinal > 0 && item.naturezaSaldo
             ? `${item.saldoFinal.toFixed(2)} ${item.naturezaSaldo}`
-            : 0,
+            : '—',
         ]),
         [
           'Total',
@@ -198,26 +192,60 @@ export class BalanceteVerificacao {
         ],
       ],
     };
-
-    try {
-      await this.exportacao.baixarExcel(
-        documento,
-        nomeEmpresa,
-        periodo
-      );
-
-      await this.arquivoPronto.abrir(
-        'Balancete de Verificação',
-        'Excel (.xlsx)',
-        '/relatorios/balancete',
-      );
-
-    } catch (erro) {
-      console.error(erro);
-      this.erroExportacao =
-        'Não foi possível gerar o Excel. Tente novamente.';
-    } finally {
-      this.gerandoExcel = false;
-    }
   }
+
+  async abrirExportacao(
+    formato: 'pdf' | 'xlsx',
+  ): Promise<void> {
+    const empresa = this.empresa();
+
+    if (!empresa) {
+      this.erroExportacao = 'Selecione uma empresa.';
+      return;
+    }
+
+    const filtros = this.filtrosAplicados();
+
+    if (
+      !filtros.dataInicial ||
+      !filtros.dataFinal ||
+      filtros.dataInicial > filtros.dataFinal
+    ) {
+      this.erroExportacao = 'Informe um período válido.';
+      return;
+    }
+
+    const documento = this.montarDocumento();
+
+    const periodo =
+      `${filtros.dataInicial} a ${filtros.dataFinal}`;
+
+    this.erroExportacao = '';
+
+    this.exportacao.prepararBalancete(
+      empresa.id,
+      periodo,
+      documento,
+    );
+
+    await this.router.navigate(
+      ['/relatorios/balancete/exportar'],
+      {
+        queryParams: {
+          tipo: 'balancete',
+          formato,
+        },
+      },
+    );
+  }
+
+  gerarPdf(): void {
+    void this.abrirExportacao('pdf');
+  }
+
+  exportarExcel(): void {
+    void this.abrirExportacao('xlsx');
+  }
+
+
 }
