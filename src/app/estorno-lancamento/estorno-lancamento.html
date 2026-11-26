@@ -1,0 +1,95 @@
+<header class="el-cabecalho">
+  <small>FINANSYS / ESCRITURAÇÃO</small>
+  <h1>Estornar lançamento #{{ numeroFormatado() }}</h1>
+  <p>O lançamento original permanece no Diário e o estorno recebe um novo número.</p>
+</header>
+
+<form class="el-formulario" (ngSubmit)="confirmarEstorno()">
+  <section class="el-card" aria-labelledby="el-titulo-confirmacao">
+    <h2 id="el-titulo-confirmacao">Confirmação de estorno</h2>
+    <p class="el-subtitulo">
+      O estorno inverte os débitos e créditos do lançamento manual da despesa.
+    </p>
+
+    <div class="el-grid-campos">
+      <label>
+        Data do estorno
+        <input
+          type="date"
+          name="dataEstorno"
+          [ngModel]="dataEstorno()"
+          (ngModelChange)="dataEstorno.set($event)"
+          required
+        />
+      </label>
+
+      <label>
+        Motivo
+        <input
+          type="text"
+          name="motivo"
+          [ngModel]="motivo()"
+          (ngModelChange)="motivo.set($event)"
+          placeholder="Ex.: operação registrada em duplicidade"
+          required
+        />
+      </label>
+    </div>
+
+    <div class="fs-table-wrap">
+      <table
+        class="fs-table el-tabela"
+        aria-label="Partidas invertidas do estorno"
+      >
+        <thead>
+          <tr>
+            <th scope="col">Conta</th>
+            <th scope="col">Débito</th>
+            <th scope="col">Crédito</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (item of partidas(); track item.codigo) {
+            <tr>
+              <td class="el-conta">{{ item.codigo }} · {{ item.nome }}</td>
+
+              <td>
+                @if (item.debito > 0) {
+                  {{ item.debito | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+                } @else {
+                  <span class="el-traco">—</span>
+                }
+              </td>
+
+              <td>
+                @if (item.credito > 0) {
+                  {{ item.credito | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+                } @else {
+                  <span class="el-traco">—</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  @if (erroValidacao) {
+    <p class="el-erro" role="alert">{{ erroValidacao }}</p>
+  }
+
+  <div class="el-acoes">
+    <a
+      class="fs-botao el-btn-cancelar"
+      [routerLink]="['/livro-diario/lancamentos', numeroFormatado()]"
+    >
+      Cancelar
+    </a>
+
+    <button class="fs-botao el-btn-confirmar" type="submit">
+      Confirmar estorno
+    </button>
+  </div>
+</form>
