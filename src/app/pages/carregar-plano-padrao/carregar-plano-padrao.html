@@ -1,0 +1,49 @@
+<div class="cpp-pagina">
+  <header class="cpp-cabecalho">
+    <small>FINANSYS / ESCRITURAÇÃO</small>
+    <h1>Carregar plano padrão</h1>
+    <p>
+      Confira o modelo inicial antes de aplicar as contas
+      ao seu plano contábil.
+    </p>
+  </header>
+
+  <app-card
+    titulo="Modelo inicial do FinanSys"
+    descricao="Estrutura contábil padrão para iniciar a configuração do seu negócio."
+  >
+    <div class="cpp-info">
+      <div>
+        <span>Modelo padrão</span>
+        <strong>Ativo, Passivo e Patrimônio Líquido</strong>
+      </div>
+
+      <div>
+        <span>Contas de resultado</span>
+        <strong>Receitas, Despesas e Apuração</strong>
+      </div>
+    </div>
+
+    <div class="cpp-acoes">
+      <a
+        class="cpp-botao cpp-secundario"
+        routerLink="/plano-contas"
+      >
+        Cancelar
+      </a>
+
+      <button
+        class="cpp-botao cpp-primario"
+        type="button"
+        (click)="aplicarPlano()"
+        [disabled]="aplicando"
+      >
+        {{ aplicando ? 'Aplicando...' : 'Aplicar plano padrão' }}
+      </button>
+    </div>
+
+    @if (erro) {
+      <p class="cpp-erro" role="alert">{{ erro }}</p>
+    }
+  </app-card>
+</div>

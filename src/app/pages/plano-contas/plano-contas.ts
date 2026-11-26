@@ -56,11 +56,6 @@ export class PlanoContas {
     this.filtrosAplicados = { ...this.filtros };
   }
 
-  carregarPlanoPadrao(): void {
-    this.planoService.restaurarPadrao();
-    this.filtros = { busca: '', grupo: '', tipo: '' };
-    this.aplicarFiltros();
-  }
 
   exportarCsv(): void {
     const cabecalho = 'Codigo;Conta contabil;Grupo;Subgrupo;Tipo';
