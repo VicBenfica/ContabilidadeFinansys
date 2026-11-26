@@ -133,6 +133,11 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'estoque/novo',
+        loadComponent: () =>
+          import('./pages/novo-produto/novo-produto').then((m) => m.NovoProduto),
+      },
+      {
         path: 'estoque',
         loadComponent: () =>
           import('./pages/estoque/estoque').then((m) => m.Estoque),
