@@ -8,6 +8,7 @@ import {
   ExportacaoService,
   type DocumentoExportacao,
 } from '../../shared/services/exportacao.service';
+import { ArquivoProntoService } from '../../shared/services/arquivo-pronto.service';
 
 export interface LinhaComposicaoResultado {
   contaGrupo: string;
@@ -26,7 +27,7 @@ export interface LinhaComposicaoResultado {
 export class Dre {
   private readonly exportacao = inject(ExportacaoService);
   readonly empresa = inject(EmpresasService).selecionada;
-
+  private readonly arquivoPronto = inject(ArquivoProntoService);
   filtros = {
     dataInicial: '2026-11-01',
     dataFinal: '2026-11-30',
@@ -106,6 +107,11 @@ export class Dre {
 
     try {
       await this.exportacao.baixarExcel(documento, nomeEmpresa, periodo);
+      await this.arquivoPronto.abrir(
+        'Demonstração do Resultado do Exercício (DRE)',
+        'Excel (.xlsx)',
+        '/relatorios/dre',
+      );
     } catch {
       this.erroExportacao = 'Não foi possível gerar o Excel. Tente novamente.';
     } finally {

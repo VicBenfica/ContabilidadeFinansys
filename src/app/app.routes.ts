@@ -17,6 +17,15 @@ export const routes: Routes = [
     children: [
       { path: 'home', component: Home },
       { path: 'empresas', component: Empresas },
+
+      // PLANO DE CONTAS
+      {
+        path: 'plano-contas/padrao',
+        loadComponent: () =>
+          import('./pages/carregar-plano-padrao/carregar-plano-padrao').then(
+            (m) => m.CarregarPlanoPadrao,
+          ),
+      },
       {
         path: 'plano-contas/exportar',
         loadComponent: () =>
@@ -53,6 +62,8 @@ export const routes: Routes = [
             (m) => m.PlanoContas,
           ),
       },
+
+      // LIVRO RAZÃO
       {
         path: 'livro-razao/exportar',
         loadComponent: () =>
@@ -63,21 +74,18 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/livro-razao/livro-razao').then((m) => m.LivroRazao),
       },
+
+      // LIVRO DIÁRIO
       {
         path: 'livro-diario/exportar',
         loadComponent: () =>
           import('./pages/exportacoes/exportacoes').then((m) => m.Exportacoes),
       },
       {
-        path: 'exportacoes',
+        path: 'livro-diario/lancamento-desequilibrado',
         loadComponent: () =>
-          import('./pages/exportacoes/exportacoes').then((m) => m.Exportacoes),
-      },
-      {
-        path: 'livro-diario/lancamentos/:numero',
-        loadComponent: () =>
-          import('./pages/lancamento-detalhe/lancamento-detalhe').then(
-            (m) => m.LancamentoDetalhe,
+          import('./pages/lancamento-desequilibrado/lancamento-desequilibrado').then(
+            (m) => m.LancamentoDesequilibrado,
           ),
       },
       {
@@ -88,14 +96,42 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'livro-diario/lancamentos/:numero',
+        loadComponent: () =>
+          import('./pages/lancamento-detalhe/lancamento-detalhe').then(
+            (m) => m.LancamentoDetalhe,
+          ),
+      },
+      {
         path: 'livro-diario',
         loadComponent: () =>
           import('./pages/livro-diario/livro-diario').then((m) => m.LivroDiario),
       },
+
+      // EXPORTAÇÕES
+      {
+        path: 'exportacoes',
+        loadComponent: () =>
+          import('./pages/exportacoes/exportacoes').then((m) => m.Exportacoes),
+      },
+      {
+        path: 'relatorios/dfc/exportar',
+        loadComponent: () =>
+          import('./pages/exportacoes/exportacoes').then((m) => m.Exportacoes),
+      },
+
+      // RELATÓRIOS
       {
         path: 'relatorios',
         redirectTo: 'relatorios/balancete',
         pathMatch: 'full',
+      },
+      {
+        path: 'relatorios/arquivo-pronto',
+        loadComponent: () =>
+          import('./pages/arquivo-pronto/arquivo-pronto').then(
+            (m) => m.ArquivoPronto,
+          ),
       },
       {
         path: 'relatorios/balancete',
@@ -121,6 +157,8 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/dfc/dfc').then((m) => m.Dfc),
       },
+
+      // ESTOQUE
       {
         path: 'estoque/compra',
         loadComponent: () =>
@@ -153,13 +191,6 @@ export const routes: Routes = [
         path: 'estoque',
         loadComponent: () =>
           import('./pages/estoque/estoque').then((m) => m.Estoque),
-      },
-      {
-        path: 'livro-diario/lancamento-desequilibrado',
-        loadComponent: () =>
-          import('./pages/lancamento-desequilibrado/lancamento-desequilibrado').then(
-            (m) => m.LancamentoDesequilibrado,
-          ),
       },
     ],
   },

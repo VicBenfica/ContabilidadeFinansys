@@ -1,13 +1,15 @@
+
 import { CurrencyPipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+
 import { Card } from '../../shared/components/card/card';
-import { EmpresasService } from '../../shared/services/empresas.service';
 import {
   ExportacaoService,
   type DocumentoExportacao,
 } from '../../shared/services/exportacao.service';
+import { EmpresasService } from '../../shared/services/empresas.service';
 
 export interface LinhaMovimentoCaixa {
   id: string;
@@ -58,6 +60,8 @@ const MOVIMENTOS_INICIAIS: LinhaMovimentoCaixa[] = [
 })
 export class Dfc {
   private readonly exportacao = inject(ExportacaoService);
+  private readonly router = inject(Router);
+
   readonly empresa = inject(EmpresasService).selecionada;
 
   filtros = {
@@ -67,14 +71,18 @@ export class Dfc {
 
   readonly filtrosAplicados = signal({ ...this.filtros });
 
-  gerandoExcel = false;
   erroExportacao = '';
 
   readonly caixaInicio = signal(1000);
-  readonly movimentos = signal<LinhaMovimentoCaixa[]>(MOVIMENTOS_INICIAIS);
+
+  readonly movimentos =
+    signal<LinhaMovimentoCaixa[]>(MOVIMENTOS_INICIAIS);
 
   readonly variacaoLiquida = computed(() =>
-    this.movimentos().reduce((acc, item) => acc + item.valor, 0),
+    this.movimentos().reduce(
+      (acc, item) => acc + item.valor,
+      0,
+    ),
   );
 
   readonly caixaFim = computed(
@@ -82,38 +90,78 @@ export class Dfc {
   );
 
   aplicarFiltros(): void {
+    if (
+      !this.filtros.dataInicial ||
+      !this.filtros.dataFinal ||
+      this.filtros.dataInicial > this.filtros.dataFinal
+    ) {
+      this.erroExportacao = 'Informe um período válido.';
+      return;
+    }
+
+    this.erroExportacao = '';
     this.filtrosAplicados.set({ ...this.filtros });
   }
 
-  gerarPdf(): void {
-    window.print();
+  // Monta o documento usando os mesmos dados exibidos na DFC.
+  private montarDocumento(): DocumentoExportacao {
+    const filtros = this.filtrosAplicados();
+
+    return {
+      titulo: `DFC - ${filtros.dataInicial} a ${filtros.dataFinal}`,
+      colunas: ['Grupo', 'Movimento', 'Valor'],
+      linhas: [
+        ...this.movimentos().map((item) => [
+          item.grupo,
+          item.movimento,
+          item.valor,
+        ]),
+      ],
+    };
   }
 
-  async exportarExcel(): Promise<void> {
-    if (this.gerandoExcel) return;
+  // Abre a página reutilizável de exportação.
+  async abrirExportacao(
+    formato: 'pdf' | 'xlsx',
+  ): Promise<void> {
+    const empresa = this.empresa();
+
+    if (!empresa) {
+      this.erroExportacao = 'Selecione uma empresa antes de exportar.';
+      return;
+    }
+
+    const documento = this.montarDocumento();
+
+    const filtros = this.filtrosAplicados();
+
+    const periodo =
+      `${filtros.dataInicial} a ${filtros.dataFinal}`;
 
     this.erroExportacao = '';
-    this.gerandoExcel = true;
 
-    const nomeEmpresa = this.empresa()?.nomeFantasia ?? 'Papelaria Aurora';
-    const periodo = this.filtrosAplicados().dataInicial.slice(0, 7) || '2026-11';
+    this.exportacao.prepararDfc(
+      empresa.id,
+      periodo,
+      documento,
+    );
 
-    const documento: DocumentoExportacao = {
-      titulo: `DFC - ${this.filtrosAplicados().dataInicial} a ${this.filtrosAplicados().dataFinal}`,
-      colunas: ['Grupo', 'Movimento', 'Valor'],
-      linhas: this.movimentos().map((item) => [
-        item.grupo,
-        item.movimento,
-        item.valor,
-      ]),
-    };
+    await this.router.navigate(
+      ['/relatorios/dfc/exportar'],
+      {
+        queryParams: {
+          tipo: 'dfc',
+          formato,
+        },
+      },
+    );
+  }
 
-    try {
-      await this.exportacao.baixarExcel(documento, nomeEmpresa, periodo);
-    } catch {
-      this.erroExportacao = 'Não foi possível gerar o Excel. Tente novamente.';
-    } finally {
-      this.gerandoExcel = false;
-    }
+  gerarPdf(): void {
+    void this.abrirExportacao('pdf');
+  }
+
+  exportarExcel(): void {
+    void this.abrirExportacao('xlsx');
   }
 }

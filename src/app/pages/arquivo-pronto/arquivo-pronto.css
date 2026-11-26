@@ -1,0 +1,109 @@
+
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.ap-pagina {
+  width: 100%;
+}
+
+.ap-cabecalho {
+  margin-bottom: 24px;
+}
+
+.ap-cabecalho small {
+  display: block;
+  margin-bottom: 6px;
+
+  color: var(--fs-roxo, #6041b0);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.ap-cabecalho h1 {
+  margin: 0;
+
+  color: var(--fs-texto, #211738);
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.ap-cabecalho p {
+  margin: 8px 0 0;
+
+  color: var(--fs-suave, #655979);
+  font-size: 13px;
+}
+
+.ap-detalhes {
+  margin: 12px 0 16px;
+
+  color: var(--fs-suave, #655979);
+  font-size: 13px;
+}
+
+.ap-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.ap-botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 38px;
+  padding: 9px 16px;
+
+  box-sizing: border-box;
+  border-radius: 8px;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.ap-primario {
+  border: 1px solid var(--fs-roxo, #6041b0);
+  background: var(--fs-roxo, #6041b0);
+  color: #fff;
+}
+
+.ap-primario:hover {
+  background: #4b328d;
+}
+
+.ap-secundario {
+  border: 1px solid var(--fs-borda, #e7e0f0);
+  background: #fff;
+  color: var(--fs-texto, #211738);
+}
+
+.ap-secundario:hover {
+  background: #f6f4ff;
+}
+
+.ap-botao:focus-visible {
+  outline: 2px solid var(--fs-roxo, #6041b0);
+  outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .ap-cabecalho h1 {
+    font-size: 24px;
+  }
+
+  .ap-acoes {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
