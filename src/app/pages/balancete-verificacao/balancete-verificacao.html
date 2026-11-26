@@ -6,6 +6,14 @@
   </div>
 
   <div class="bv-acoes">
+    <a
+      class="fs-botao bv-btn"
+      routerLink="/relatorios/balancete/exportar"
+      [queryParams]="{ tipo: 'balancete' }"
+    >
+      Exportar
+    </a>
+
     <button class="fs-botao bv-btn" type="button" (click)="gerarPdf()">
       Gerar PDF
     </button>
