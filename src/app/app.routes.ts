@@ -17,6 +17,12 @@ export const routes: Routes = [
             { path: 'home', component: Home },
             { path: 'empresas', component: Empresas },
             {
+                path: 'plano-contas/padrao',
+                loadComponent: () =>
+                    import('./pages/carregar-plano-padrao/carregar-plano-padrao')
+                        .then((m) => m.CarregarPlanoPadrao),
+            },
+            {
                 path: 'plano-contas/exportar',
                 loadComponent: () =>
                     import('./pages/exportacoes/exportacoes')
