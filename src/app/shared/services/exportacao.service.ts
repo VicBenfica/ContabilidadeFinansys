@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { LancamentosService } from './lancamentos.service';
 import { montarRazao } from '../utils/livro-razao';
+import { signal } from '@angular/core';
 export interface DocumentoExportacao {
     titulo: string;
     colunas: string[];
@@ -74,6 +75,25 @@ export class ExportacaoService {
                 ],
             },
         };
+    }
+    private readonly dfcPreparada = signal<{
+        empresaId: number;
+        periodo: string;
+        documento: DocumentoExportacao;
+    } | null>(null);
+
+    prepararDfc(
+        empresaId: number,
+        periodo: string,
+        documento: DocumentoExportacao
+    ): void {
+        this.dfcPreparada.set({ empresaId, periodo, documento });
+    }
+
+    obterDfc(empresaId: number) {
+        const dados = this.dfcPreparada();
+
+        return dados?.empresaId === empresaId ? dados : null;
     }
     async baixarExcel(
         documento: DocumentoExportacao,
