@@ -10,44 +10,23 @@
       Gerar PDF
     </button>
 
-    <button
-      class="fs-botao dre-btn"
-      type="button"
-      [disabled]="gerandoExcel"
-      (click)="exportarExcel()"
-    >
-      {{ gerandoExcel ? 'Exportando…' : 'Exportar Excel' }}
+    <button class="fs-botao dre-btn" type="button" (click)="exportarExcel()">
+      Exportar Excel
     </button>
   </div>
 </header>
 
 <nav class="dre-abas" aria-label="Relatórios contábeis">
-  <a
-    class="dre-aba"
-    routerLink="/relatorios/balancete"
-    routerLinkActive="dre-aba-ativa"
-  >
+  <a class="dre-aba" routerLink="/relatorios/balancete" routerLinkActive="dre-aba-ativa">
     Balancete
   </a>
-  <a
-    class="dre-aba"
-    routerLink="/relatorios/balanco-patrimonial"
-    routerLinkActive="dre-aba-ativa"
-  >
+  <a class="dre-aba" routerLink="/relatorios/balanco-patrimonial" routerLinkActive="dre-aba-ativa">
     Balanço Patrimonial
   </a>
-  <a
-    class="dre-aba"
-    routerLink="/relatorios/dre"
-    routerLinkActive="dre-aba-ativa"
-  >
+  <a class="dre-aba" routerLink="/relatorios/dre" routerLinkActive="dre-aba-ativa">
     DRE
   </a>
-  <a
-    class="dre-aba"
-    routerLink="/relatorios/dfc"
-    routerLinkActive="dre-aba-ativa"
-  >
+  <a class="dre-aba" routerLink="/relatorios/dfc" routerLinkActive="dre-aba-ativa">
     DFC
   </a>
 </nav>
@@ -69,7 +48,7 @@
 </section>
 
 @if (erroExportacao) {
-  <p class="dre-erro" role="alert">{{ erroExportacao }}</p>
+<p class="dre-erro" role="alert">{{ erroExportacao }}</p>
 }
 
 <section class="dre-resumo-cards" aria-label="Indicadores de resultado">
@@ -108,17 +87,17 @@
 
       <tbody>
         @for (item of composicaoResultado(); track item.contaGrupo) {
-          <tr>
-            <td class="dre-conta">{{ item.contaGrupo }}</td>
-            <td>{{ item.descricao }}</td>
-            <td class="dre-total">
-              @if (item.redutora) {
-                ({{ item.total | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }})
-              } @else {
-                {{ item.total | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
-              }
-            </td>
-          </tr>
+        <tr>
+          <td class="dre-conta">{{ item.contaGrupo }}</td>
+          <td>{{ item.descricao }}</td>
+          <td class="dre-total">
+            @if (item.redutora) {
+            ({{ item.total | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }})
+            } @else {
+            {{ item.total | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+            }
+          </td>
+        </tr>
         }
       </tbody>
     </table>
