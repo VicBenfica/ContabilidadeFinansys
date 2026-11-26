@@ -1,0 +1,54 @@
+<header class="np-cabecalho">
+  <small>FINANSYS / ESCRITURAÇÃO</small>
+  <h1>Novo produto</h1>
+  <p>Cadastre a mercadoria antes de registrar a entrada no estoque.</p>
+</header>
+
+<section class="np-card" aria-labelledby="np-titulo-identificacao">
+  <h2 id="np-titulo-identificacao">Identificação</h2>
+  <p class="np-subtitulo">
+    A quantidade inicial fica em zero até o primeiro movimento de entrada.
+  </p>
+
+  <form class="np-formulario" (ngSubmit)="cadastrarProduto()">
+    <div class="np-grid-campos">
+      <label>
+        Nome do produto
+        <input
+          type="text"
+          name="nome"
+          [ngModel]="nome()"
+          (ngModelChange)="nome.set($event)"
+          placeholder="Ex.: Caderno"
+          required
+        />
+      </label>
+
+      <label>
+        Unidade
+        <select
+          name="unidade"
+          [ngModel]="unidade()"
+          (ngModelChange)="unidade.set($event)"
+          required
+        >
+          @for (item of unidades; track item) {
+            <option [value]="item">{{ item }}</option>
+          }
+        </select>
+      </label>
+    </div>
+
+    @if (erroValidacao) {
+      <p class="np-erro" role="alert">{{ erroValidacao }}</p>
+    }
+
+    <div class="np-acoes">
+      <a class="fs-botao np-btn-cancelar" routerLink="/estoque">Cancelar</a>
+
+      <button class="fs-botao np-btn-confirmar" type="submit">
+        Cadastrar produto
+      </button>
+    </div>
+  </form>
+</section>
